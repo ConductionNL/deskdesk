@@ -1,27 +1,32 @@
 // SPDX-License-Identifier: EUPL-1.2
 //
-// Vue Router — always use static imports (no lazy import()).
-// Lazy imports cause ChunkLoadError in Nextcloud because chunks are
-// served from /apps/<id>/js/ but files live at /custom_apps/<id>/js/.
+// Vue Router — manifest-driven.
+//
+// Every entry in manifest.pages becomes a route whose `name` matches
+// `page.id` (so CnPageRenderer can dispatch the correct stacked view)
+// and whose `path` is `page.route`. The component for every page is
+// CnPageRenderer; it reads the matched page from the injected manifest
+// and chooses CnIndexPage / CnDetailPage / CnDashboardPage / a custom
+// component based on `page.type`.
 
 import Vue from 'vue'
 import Router from 'vue-router'
 import { generateUrl } from '@nextcloud/router'
-import Dashboard from '../views/Dashboard.vue'
-import ItemList from '../views/items/ItemList.vue'
-import ItemDetail from '../views/items/ItemDetail.vue'
+import { CnPageRenderer } from '@conduction/nextcloud-vue'
+import manifest from '../manifest.json'
+
 Vue.use(Router)
+
+const routes = manifest.pages.map((page) => ({
+	name: page.id,
+	path: page.route,
+	component: CnPageRenderer,
+}))
+
+routes.push({ path: '*', redirect: '/' })
 
 export default new Router({
 	mode: 'history',
 	base: generateUrl('/apps/deskdesk'),
-	routes: [
-		{ path: '/', name: 'Dashboard', component: Dashboard },
-		{ path: '/items', name: 'Items', component: ItemList },
-		{ path: '/items/:id', name: 'ItemDetail', component: ItemDetail,
-			props: route => ({ itemId: route.params.id }) },
-		// No /settings route — settings opens as NcAppSettingsDialog modal
-		// Admin settings live at /settings/admin/{appid} (managed by NC via AdminSettings.php)
-		{ path: '*', redirect: '/' },
-	],
+	routes,
 })

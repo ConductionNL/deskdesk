@@ -2,8 +2,8 @@
   "openapi": "3.0.0",
   "info": {
     "title": "DeskDesk Register",
-    "description": "Register containing all schemas for the DeskDesk application — desks, bookings, and floors.",
-    "version": "0.1.0"
+    "description": "Register containing all schemas for the DeskDesk application — floors, desks, and bookings.",
+    "version": "0.2.0"
   },
   "x-openregister": {
     "type": "application",
@@ -13,84 +13,273 @@
   },
   "paths": {},
   "components": {
+    "registers": {
+      "deskdesk": {
+        "slug": "deskdesk",
+        "title": "DeskDesk",
+        "description": "Floors, desks, and bookings for the DeskDesk app.",
+        "version": "0.2.0",
+        "schemas": ["floor", "desk", "booking"]
+      }
+    },
     "schemas": {
-      "article": {
-        "slug": "article",
-        "icon": "FileDocumentOutline",
+      "floor": {
+        "slug": "floor",
+        "icon": "OfficeBuildingOutline",
         "version": "0.1.0",
-        "title": "Article",
-        "description": "schema.org/Article — a written composition published in print or digital form. Aligned with https://schema.org/Article per ADR-011: use schema.org vocabulary instead of ad-hoc domain types whenever a standard type fits.",
+        "title": "Floor",
+        "description": "A physical floor in a building. Group desks together by location so users can browse and filter by where they sit.",
         "type": "object",
-        "x-schema-org": "https://schema.org/Article",
-        "required": [
-          "name"
-        ],
+        "required": ["label"],
         "properties": {
-          "name": {
+          "label": {
             "type": "string",
-            "description": "The name/headline of the article (schema.org/name).",
-            "example": "Getting started with the app template"
+            "description": "Display name of the floor.",
+            "example": "Floor 3"
           },
-          "description": {
+          "building": {
             "type": "string",
-            "description": "A short description of the article (schema.org/description).",
-            "example": "A worked example showing how to replace this schema with your own."
+            "description": "Optional building identifier when an organisation occupies more than one.",
+            "example": "Amsterdam HQ"
           },
-          "identifier": {
+          "planImage": {
             "type": "string",
-            "description": "An external identifier for the article — ISBN, DOI, URI, etc. (schema.org/identifier).",
-            "example": "doi:10.1000/example"
+            "format": "uri",
+            "description": "URL to a static floor-plan image, rendered next to the floor in the detail view.",
+            "example": "https://example.com/floor-plans/floor-3.svg"
+          }
+        }
+      },
+      "desk": {
+        "slug": "desk",
+        "icon": "DeskOutline",
+        "version": "0.1.0",
+        "title": "Desk",
+        "description": "A bookable desk in an open-office. Desks belong to a floor and a zone, and carry equipment + accessibility metadata so users can pick the right one.",
+        "type": "object",
+        "required": ["label", "floor", "zone"],
+        "properties": {
+          "label": {
+            "type": "string",
+            "description": "Short, unique label for the desk. Convention: floor + zone + sequence (e.g. 3-East-12).",
+            "example": "3-East-12"
           },
-          "dateCreated": {
+          "floor": {
             "type": "string",
-            "format": "date",
-            "description": "The date the article was created (schema.org/dateCreated).",
-            "example": "2026-04-20"
+            "description": "Floor this desk belongs to. References a floor object by uuid.",
+            "x-openregister-relations": {
+              "schema": "floor",
+              "cardinality": "many-to-one"
+            },
+            "example": "9b6d8d8f-1a8a-4c5d-9d5e-6e3a8a9c9d12"
           },
-          "author": {
+          "zone": {
             "type": "string",
-            "description": "The author of the article (schema.org/author). Kept as a string for template simplicity; nest a Person object in real apps.",
-            "example": "Conduction B.V."
+            "description": "Zone within the floor. Helps users find desks near specific facilities (printer, kitchen, phonebooths).",
+            "enum": ["north", "south", "east", "west", "central"],
+            "example": "east"
+          },
+          "equipment": {
+            "type": "array",
+            "description": "Equipment available at the desk. Used as a filter in the index page.",
+            "items": {
+              "type": "string",
+              "enum": ["dual-monitor", "standing", "phonebooth-adjacent", "wired-network", "extra-power"]
+            },
+            "example": ["dual-monitor", "wired-network"]
+          },
+          "capacity": {
+            "type": "integer",
+            "minimum": 1,
+            "default": 1,
+            "description": "How many people the desk seats. Most desks seat one; meeting desks can seat more.",
+            "example": 1
+          },
+          "accessibility": {
+            "type": "boolean",
+            "default": false,
+            "description": "True when the desk is wheelchair-accessible (height-adjustable, clear floor space, accessible route).",
+            "example": false
+          },
+          "photo": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL to a photo of the desk in context.",
+            "example": "https://example.com/desk-photos/3-east-12.jpg"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Free-form notes for the desk (quirks, etiquette, neighbours).",
+            "example": "Window seat. Direct sun in the afternoon — bring a curtain clip if you need shade."
+          }
+        }
+      },
+      "booking": {
+        "slug": "booking",
+        "icon": "CalendarClock",
+        "version": "0.1.0",
+        "title": "Booking",
+        "description": "A reservation of one desk by one user for a time slot. Status moves tentative -> confirmed -> cancelled. Recurrence is optional.",
+        "type": "object",
+        "required": ["desk", "user", "start", "end"],
+        "properties": {
+          "desk": {
+            "type": "string",
+            "description": "Desk being booked. References a desk object by uuid.",
+            "x-openregister-relations": {
+              "schema": "desk",
+              "cardinality": "many-to-one"
+            },
+            "example": "8a8a8a8a-1234-1234-1234-123412341234"
+          },
+          "user": {
+            "type": "string",
+            "description": "Nextcloud user id who made the booking.",
+            "example": "alice"
+          },
+          "start": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Start of the booking. ISO 8601 with timezone.",
+            "example": "2026-05-12T09:00:00+02:00"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time",
+            "description": "End of the booking. ISO 8601 with timezone.",
+            "example": "2026-05-12T17:00:00+02:00"
+          },
+          "purpose": {
+            "type": "string",
+            "description": "Short note about why the desk was booked. Useful for teams sharing a zone.",
+            "example": "Focus work — review documents"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["tentative", "confirmed", "cancelled"],
+            "default": "confirmed",
+            "description": "Lifecycle state of the booking.",
+            "example": "confirmed"
+          },
+          "recurrence": {
+            "type": "string",
+            "description": "Optional RFC 5545 RRULE for recurring bookings. Keeps the schema simple; the recurrence engine can expand on read.",
+            "example": "FREQ=WEEKLY;BYDAY=MO,WE,FR;COUNT=12"
           }
         }
       }
     },
     "objects": {
-      "article-gemeente-utrecht": {
+      "floor-3-amsterdam": {
         "@self": {
           "register": "deskdesk",
-          "schema": "article",
-          "slug": "article-gemeente-utrecht"
+          "schema": "floor",
+          "slug": "floor-3-amsterdam"
         },
-        "name": "Gemeente Utrecht pilot",
-        "description": "Seed article describing a realistic pilot project for a Dutch municipality. Per ADR-001 every app MUST include 3-5 realistic objects per schema so the app is immediately demonstrable after install.",
-        "identifier": "pilot-2026-utrecht",
-        "dateCreated": "2026-03-15",
-        "author": "Conduction B.V."
+        "label": "Floor 3",
+        "building": "Amsterdam HQ"
       },
-      "article-conduction-consultancy": {
+      "floor-2-amsterdam": {
         "@self": {
           "register": "deskdesk",
-          "schema": "article",
-          "slug": "article-conduction-consultancy"
+          "schema": "floor",
+          "slug": "floor-2-amsterdam"
         },
-        "name": "Conduction consultancy engagement",
-        "description": "Seed article covering architecture review and ADR authoring for a consultancy engagement. Values are fictional but realistic.",
-        "identifier": "engagement-2026-consultancy",
-        "dateCreated": "2026-03-22",
-        "author": "Conduction B.V."
+        "label": "Floor 2",
+        "building": "Amsterdam HQ"
       },
-      "article-travel-agency": {
+      "desk-3-east-12": {
         "@self": {
           "register": "deskdesk",
-          "schema": "article",
-          "slug": "article-travel-agency"
+          "schema": "desk",
+          "slug": "desk-3-east-12"
         },
-        "name": "Nieuw Horizon travel agency onboarding",
-        "description": "Third seed article demonstrating variety of content. Re-importing is idempotent: ImportHandler matches by slug.",
-        "identifier": "onboarding-2026-nieuwhorizon",
-        "dateCreated": "2026-04-01",
-        "author": "Conduction B.V."
+        "label": "3-East-12",
+        "floor": "floor-3-amsterdam",
+        "zone": "east",
+        "equipment": ["dual-monitor", "wired-network"],
+        "capacity": 1,
+        "accessibility": false,
+        "notes": "Window seat with direct afternoon sun."
+      },
+      "desk-3-east-13": {
+        "@self": {
+          "register": "deskdesk",
+          "schema": "desk",
+          "slug": "desk-3-east-13"
+        },
+        "label": "3-East-13",
+        "floor": "floor-3-amsterdam",
+        "zone": "east",
+        "equipment": ["dual-monitor", "standing"],
+        "capacity": 1,
+        "accessibility": true
+      },
+      "desk-3-central-meeting": {
+        "@self": {
+          "register": "deskdesk",
+          "schema": "desk",
+          "slug": "desk-3-central-meeting"
+        },
+        "label": "3-Central-Meeting",
+        "floor": "floor-3-amsterdam",
+        "zone": "central",
+        "equipment": ["phonebooth-adjacent", "extra-power"],
+        "capacity": 4,
+        "accessibility": true,
+        "notes": "Four-person collaboration desk near the phonebooths."
+      },
+      "desk-2-west-04": {
+        "@self": {
+          "register": "deskdesk",
+          "schema": "desk",
+          "slug": "desk-2-west-04"
+        },
+        "label": "2-West-04",
+        "floor": "floor-2-amsterdam",
+        "zone": "west",
+        "equipment": ["wired-network"],
+        "capacity": 1,
+        "accessibility": false
+      },
+      "booking-admin-3-east-12-mon": {
+        "@self": {
+          "register": "deskdesk",
+          "schema": "booking",
+          "slug": "booking-admin-3-east-12-mon"
+        },
+        "desk": "desk-3-east-12",
+        "user": "admin",
+        "start": "2026-05-12T09:00:00+02:00",
+        "end": "2026-05-12T17:00:00+02:00",
+        "purpose": "Focus work — code review",
+        "status": "confirmed"
+      },
+      "booking-admin-meeting-3-central": {
+        "@self": {
+          "register": "deskdesk",
+          "schema": "booking",
+          "slug": "booking-admin-meeting-3-central"
+        },
+        "desk": "desk-3-central-meeting",
+        "user": "admin",
+        "start": "2026-05-13T13:00:00+02:00",
+        "end": "2026-05-13T15:00:00+02:00",
+        "purpose": "Sprint planning",
+        "status": "confirmed"
+      },
+      "booking-tentative-2-west": {
+        "@self": {
+          "register": "deskdesk",
+          "schema": "booking",
+          "slug": "booking-tentative-2-west"
+        },
+        "desk": "desk-2-west-04",
+        "user": "admin",
+        "start": "2026-05-14T09:00:00+02:00",
+        "end": "2026-05-14T13:00:00+02:00",
+        "purpose": "Quiet morning",
+        "status": "tentative"
       }
     }
   }

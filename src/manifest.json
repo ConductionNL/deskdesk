@@ -1,0 +1,100 @@
+{
+  "$schema": "https://raw.githubusercontent.com/ConductionNL/nextcloud-vue/main/src/schemas/app-manifest.schema.json",
+  "version": "1.0.0",
+  "id": "deskdesk",
+  "title": "DeskDesk",
+  "dependencies": ["openregister"],
+  "menu": [
+    {
+      "id": "desks-index",
+      "label": "deskdesk.menu.desks",
+      "icon": "icon-category-organization",
+      "route": "desks-index",
+      "order": 10
+    },
+    {
+      "id": "bookings-index",
+      "label": "deskdesk.menu.bookings",
+      "icon": "icon-calendar",
+      "route": "bookings-index",
+      "order": 20
+    },
+    {
+      "id": "floors-index",
+      "label": "deskdesk.menu.floors",
+      "icon": "icon-category-monitoring",
+      "route": "floors-index",
+      "order": 30
+    }
+  ],
+  "pages": [
+    {
+      "id": "desks-index",
+      "route": "/",
+      "type": "index",
+      "title": "deskdesk.desks.indexTitle",
+      "config": {
+        "register": "deskdesk",
+        "schema": "desk",
+        "columns": ["label", "floor", "zone", "equipment", "capacity", "accessibility"],
+        "filters": ["floor", "zone", "equipment", "accessibility"],
+        "defaultSort": {"key": "label", "order": "asc"}
+      }
+    },
+    {
+      "id": "desks-detail",
+      "route": "/desks/:id",
+      "type": "detail",
+      "title": "deskdesk.desks.detailTitle",
+      "config": {
+        "register": "deskdesk",
+        "schema": "desk"
+      }
+    },
+    {
+      "id": "bookings-index",
+      "route": "/bookings",
+      "type": "index",
+      "title": "deskdesk.bookings.indexTitle",
+      "config": {
+        "register": "deskdesk",
+        "schema": "booking",
+        "columns": ["desk", "user", "start", "end", "status", "purpose"],
+        "filters": ["status", "user"],
+        "defaultSort": {"key": "start", "order": "desc"}
+      }
+    },
+    {
+      "id": "bookings-detail",
+      "route": "/bookings/:id",
+      "type": "detail",
+      "title": "deskdesk.bookings.detailTitle",
+      "config": {
+        "register": "deskdesk",
+        "schema": "booking"
+      }
+    },
+    {
+      "id": "floors-index",
+      "route": "/floors",
+      "type": "index",
+      "title": "deskdesk.floors.indexTitle",
+      "config": {
+        "register": "deskdesk",
+        "schema": "floor",
+        "columns": ["label", "building"],
+        "defaultSort": {"key": "label", "order": "asc"}
+      }
+    },
+    {
+      "id": "floors-detail",
+      "route": "/floors/:id",
+      "type": "detail",
+      "title": "deskdesk.floors.detailTitle",
+      "config": {
+        "register": "deskdesk",
+        "schema": "floor"
+      }
+    }
+  ]
+}
