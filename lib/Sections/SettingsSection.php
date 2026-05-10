@@ -1,33 +1,35 @@
 <?php
-// SPDX-License-Identifier: EUPL-1.2
 
 /**
- * AppTemplate Settings Section
+ * DeskDesk Settings Section
  *
- * Defines the AppTemplate section in the Nextcloud admin settings.
+ * Defines the DeskDesk section in the Nextcloud admin settings.
  *
  * @category Sections
- * @package  OCA\AppTemplate\Sections
+ * @package  OCA\DeskDesk\Sections
  *
- * @author    Conduction Development Team <dev@conductio.nl>
- * @copyright 2024 Conduction B.V.
+ * @author    Conduction Development Team <info@conduction.nl>
+ * @copyright 2026 Conduction B.V.
  * @license   EUPL-1.2 https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
  *
  * @version GIT: <git-id>
  *
  * @link https://conduction.nl
+ *
+ * @spec openspec/changes/example-change/tasks.md#task-7
+ *   (Illustrative file-level @spec tag per ADR-003.)
  */
 
 declare(strict_types=1);
 
-namespace OCA\AppTemplate\Sections;
+namespace OCA\DeskDesk\Sections;
 
 use OCP\IL10N;
 use OCP\IURLGenerator;
 use OCP\Settings\IIconSection;
 
 /**
- * Defines the AppTemplate section in the Nextcloud admin settings.
+ * Defines the DeskDesk section in the Nextcloud admin settings.
  */
 class SettingsSection implements IIconSection
 {
@@ -52,7 +54,7 @@ class SettingsSection implements IIconSection
      */
     public function getID(): string
     {
-        return 'app-template';
+        return 'deskdesk';
     }//end getID()
 
     /**
@@ -62,7 +64,7 @@ class SettingsSection implements IIconSection
      */
     public function getName(): string
     {
-        return $this->l->t('App Template');
+        return $this->l->t('DeskDesk');
     }//end getName()
 
     /**
@@ -82,6 +84,6 @@ class SettingsSection implements IIconSection
      */
     public function getIcon(): string
     {
-        return $this->urlGenerator->imagePath(appName: 'app-template', file: 'app-dark.svg');
+        return $this->urlGenerator->imagePath(appName: 'deskdesk', file: 'app-dark.svg');
     }//end getIcon()
 }//end class

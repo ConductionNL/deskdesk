@@ -1,14 +1,14 @@
 {
-  "id": "app-template",
-  "name": "Nextcloud App Template",
-  "namespace": "AppTemplate",
-  "summary": "A template for creating new Nextcloud apps",
-  "goal": "A starting point for building Nextcloud apps following ConductionNL conventions",
-  "category": "tools",
+  "id": "deskdesk",
+  "name": "DeskDesk",
+  "namespace": "DeskDesk",
+  "summary": "Flexible desk booking for open-office environments",
+  "goal": "Reference app for the Conduction Nextcloud stack: schemas + manifest + stacked views + schema-driven NC Calendar / xWiki integrations",
+  "category": "organization",
   "version": "0.1.0",
   "license": "EUPL-1.2",
   "author": "Conduction B.V.",
-  "repository": "https://github.com/ConductionNL/nextcloud-app-template",
+  "repository": "https://github.com/ConductionNL/deskdesk",
   "dependencies": {
     "requiresOpenRegister": true,
     "additionalCiApps": [
@@ -20,6 +20,6 @@
     "nextcloudRefs": ["stable31", "stable32"],
     "enableNewman": false
   },
-  "createdAt": "2025-01-01",
-  "updatedAt": "2026-03-23"
+  "createdAt": "2026-05-10",
+  "updatedAt": "2026-05-10"
 }

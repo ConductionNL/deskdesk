@@ -1,34 +1,36 @@
 <?php
-// SPDX-License-Identifier: EUPL-1.2
 
 /**
- * AppTemplate Admin Settings
+ * DeskDesk Admin Settings
  *
- * Provides the admin settings form for the AppTemplate application.
+ * Provides the admin settings form for the DeskDesk application.
  *
  * @category Settings
- * @package  OCA\AppTemplate\Settings
+ * @package  OCA\DeskDesk\Settings
  *
- * @author    Conduction Development Team <dev@conductio.nl>
- * @copyright 2024 Conduction B.V.
+ * @author    Conduction Development Team <info@conduction.nl>
+ * @copyright 2026 Conduction B.V.
  * @license   EUPL-1.2 https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
  *
  * @version GIT: <git-id>
  *
  * @link https://conduction.nl
+ *
+ * @spec openspec/changes/example-change/tasks.md#task-6
+ *   (Illustrative file-level @spec tag per ADR-003.)
  */
 
 declare(strict_types=1);
 
-namespace OCA\AppTemplate\Settings;
+namespace OCA\DeskDesk\Settings;
 
-use OCA\AppTemplate\AppInfo\Application;
+use OCA\DeskDesk\AppInfo\Application;
 use OCP\App\IAppManager;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\Settings\ISettings;
 
 /**
- * Provides the admin settings form for the AppTemplate application.
+ * Provides the admin settings form for the DeskDesk application.
  */
 class AdminSettings implements ISettings
 {
@@ -65,7 +67,7 @@ class AdminSettings implements ISettings
      */
     public function getSection(): string
     {
-        return 'app-template';
+        return 'deskdesk';
     }//end getSection()
 
     /**

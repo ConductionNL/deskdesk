@@ -2,17 +2,17 @@
 	<NcAppSettingsDialog
 		:open="open"
 		:show-navigation="false"
-		:name="t('app-template', 'App Template settings')"
+		:name="t('deskdesk', 'DeskDesk settings')"
 		@update:open="$emit('update:open', $event)">
 		<NcAppSettingsSection
 			id="general"
-			:name="t('app-template', 'General')">
+			:name="t('deskdesk', 'General')">
 			<template #icon>
 				<CogIcon :size="20" />
 			</template>
 			<NcEmptyContent
-				:name="t('app-template', 'No settings available yet')"
-				:description="t('app-template', 'User settings will appear here in a future update.')">
+				:name="t('deskdesk', 'No settings available yet')"
+				:description="t('deskdesk', 'User settings will appear here in a future update.')">
 				<template #icon>
 					<CogIcon :size="64" />
 				</template>
@@ -22,7 +22,8 @@
 </template>
 
 <script>
-import { NcAppSettingsDialog, NcAppSettingsSection, NcEmptyContent } from '@nextcloud/vue'
+// ADR-004: NC components come from @conduction/nextcloud-vue.
+import { NcAppSettingsDialog, NcAppSettingsSection, NcEmptyContent } from '@conduction/nextcloud-vue'
 import CogIcon from 'vue-material-design-icons/Cog.vue'
 
 export default {

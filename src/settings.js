@@ -8,9 +8,9 @@ import AdminRoot from './views/settings/AdminRoot.vue'
 Vue.mixin({ methods: { t, n } })
 Vue.use(PiniaVuePlugin)
 
-loadTranslations('app-template', () => {
+loadTranslations('deskdesk', () => {
 	new Vue({
 		pinia,
 		render: h => h(AdminRoot),
-	}).$mount('#app-template-settings')
+	}).$mount('#deskdesk-settings')
 })

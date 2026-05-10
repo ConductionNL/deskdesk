@@ -1,6 +1,6 @@
 {
-	"name": "conductionnl/app-template",
-	"description": "A template for creating new Nextcloud apps",
+	"name": "conductionnl/deskdesk",
+	"description": "Flexible desk booking for open-office environments — reference app for the Conduction Nextcloud stack",
 	"license": "EUPL-1.2",
 	"authors": [
 		{
@@ -11,7 +11,7 @@
 	],
 	"autoload": {
 		"psr-4": {
-			"OCA\\AppTemplate\\": "lib/"
+			"OCA\\DeskDesk\\": "lib/"
 		}
 	},
 	"require": {

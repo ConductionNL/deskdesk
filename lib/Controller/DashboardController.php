@@ -1,34 +1,37 @@
 <?php
-// SPDX-License-Identifier: EUPL-1.2
 
 /**
- * AppTemplate Dashboard Controller
+ * DeskDesk Dashboard Controller
  *
- * Controller for the main AppTemplate dashboard page.
+ * Controller for the main DeskDesk dashboard page.
  *
  * @category Controller
- * @package  OCA\AppTemplate\Controller
+ * @package  OCA\DeskDesk\Controller
  *
- * @author    Conduction Development Team <dev@conductio.nl>
- * @copyright 2024 Conduction B.V.
+ * @author    Conduction Development Team <info@conduction.nl>
+ * @copyright 2026 Conduction B.V.
  * @license   EUPL-1.2 https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
  *
  * @version GIT: <git-id>
  *
  * @link https://conduction.nl
+ *
+ * @spec openspec/changes/example-change/tasks.md#task-1
+ *   (Illustrative file-level @spec tag per ADR-003 — every PHP class must
+ *   link back to the OpenSpec change that created or last modified it.)
  */
 
 declare(strict_types=1);
 
-namespace OCA\AppTemplate\Controller;
+namespace OCA\DeskDesk\Controller;
 
-use OCA\AppTemplate\AppInfo\Application;
+use OCA\DeskDesk\AppInfo\Application;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IRequest;
 
 /**
- * Controller for the main AppTemplate dashboard page.
+ * Controller for the main DeskDesk dashboard page.
  */
 class DashboardController extends Controller
 {
@@ -38,6 +41,8 @@ class DashboardController extends Controller
      * @param IRequest $request The request object
      *
      * @return void
+     *
+     * @spec openspec/changes/example-change/tasks.md#task-1
      */
     public function __construct(IRequest $request)
     {
@@ -51,6 +56,8 @@ class DashboardController extends Controller
      * @NoCSRFRequired
      *
      * @return TemplateResponse
+     *
+     * @spec openspec/changes/example-change/tasks.md#task-1
      */
     public function page(): TemplateResponse
     {
@@ -64,6 +71,8 @@ class DashboardController extends Controller
      * @NoCSRFRequired
      *
      * @return TemplateResponse
+     *
+     * @spec openspec/changes/example-change/tasks.md#task-1
      */
     public function catchAll(): TemplateResponse
     {

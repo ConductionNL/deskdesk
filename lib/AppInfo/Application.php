@@ -1,29 +1,32 @@
 <?php
-// SPDX-License-Identifier: EUPL-1.2
 
 /**
- * AppTemplate Application
+ * DeskDesk Application
  *
- * Main application class for the AppTemplate Nextcloud app.
+ * Main application class for the DeskDesk Nextcloud app.
  *
  * @category AppInfo
- * @package  OCA\AppTemplate\AppInfo
+ * @package  OCA\DeskDesk\AppInfo
  *
- * @author    Conduction Development Team <dev@conductio.nl>
- * @copyright 2024 Conduction B.V.
+ * @author    Conduction Development Team <info@conduction.nl>
+ * @copyright 2026 Conduction B.V.
  * @license   EUPL-1.2 https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
  *
  * @version GIT: <git-id>
  *
  * @link https://conduction.nl
+ *
+ * @spec openspec/changes/{change-name}/tasks.md#task-N
+ *   (file-level @spec tag — link back to the OpenSpec change that created or
+ *   last modified this file. Multiple @spec tags allowed. Public methods SHOULD
+ *   also carry their own @spec tag.)
  */
 
 declare(strict_types=1);
 
-namespace OCA\AppTemplate\AppInfo;
+namespace OCA\DeskDesk\AppInfo;
 
-use OCA\AppTemplate\Listener\DeepLinkRegistrationListener;
-use OCA\AppTemplate\Repair\InitializeSettings;
+use OCA\DeskDesk\Listener\DeepLinkRegistrationListener;
 use OCA\OpenRegister\Event\DeepLinkRegistrationEvent;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
@@ -31,11 +34,11 @@ use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
 
 /**
- * Main application class for the AppTemplate Nextcloud app.
+ * Main application class for the DeskDesk Nextcloud app.
  */
 class Application extends App implements IBootstrap
 {
-    public const APP_ID = 'app-template';
+    public const APP_ID = 'deskdesk';
 
     /**
      * Constructor for the Application class.
@@ -65,9 +68,10 @@ class Application extends App implements IBootstrap
             listener: DeepLinkRegistrationListener::class
         );
 
-        // Initialize register and schemas on install/upgrade.
-        $context->registerRepairStep(InitializeSettings::class);
-
+        // Repair step InitializeSettings is registered via appinfo/info.xml's
+        // <repair-steps> instead of IRegistrationContext::registerRepairStep(),
+        // because the latter is not present on every Nextcloud version we
+        // support. This keeps register/schema bootstrap on first install.
     }//end register()
 
     /**

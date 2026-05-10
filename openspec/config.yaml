@@ -1,13 +1,13 @@
 schema: conduction
 
 context: |
-  Project: App Template
-  Repo: ConductionNL/nextcloud-app-template
+  Project: DeskDesk
+  Repo: ConductionNL/deskdesk
   Type: Nextcloud App (PHP backend + Vue 2 frontend)
-  Description: Starter template for Conduction Nextcloud apps — replace this description with your app's purpose.
-  Key components: Dashboard, Settings, Example objects
+  Description: Flexible desk booking for open-office environments. Reference app for the Conduction Nextcloud stack: schemas, manifest, stacked views, schema-driven NC Calendar / xWiki integrations.
+  Key components: Desk index, Booking detail, Dashboard, Settings
   Database: PostgreSQL (via OpenRegister's ObjectService)
-  Mount path: /var/www/html/custom_apps/app-template
+  Mount path: /var/www/html/custom_apps/deskdesk
 
   Architecture:
     Pattern: Thin client — App Template owns no database tables

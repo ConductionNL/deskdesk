@@ -1,27 +1,31 @@
 <?php
 
 /**
- * AppTemplate Settings Service
+ * DeskDesk Settings Service
  *
- * Service for managing AppTemplate application configuration and settings.
+ * Service for managing DeskDesk application configuration and settings.
  *
  * @category Service
- * @package  OCA\AppTemplate\Service
+ * @package  OCA\DeskDesk\Service
  *
- * @author    Conduction Development Team <dev@conductio.nl>
- * @copyright 2024 Conduction B.V.
+ * @author    Conduction Development Team <info@conduction.nl>
+ * @copyright 2026 Conduction B.V.
  * @license   EUPL-1.2 https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
  *
  * @version GIT: <git-id>
  *
  * @link https://conduction.nl
+ *
+ * @spec openspec/changes/example-change/tasks.md#task-3
+ *   (Illustrative file-level @spec tag per ADR-003 — every PHP class must
+ *   link back to the OpenSpec change that created or last modified it.)
  */
 
 declare(strict_types=1);
 
-namespace OCA\AppTemplate\Service;
+namespace OCA\DeskDesk\Service;
 
-use OCA\AppTemplate\AppInfo\Application;
+use OCA\DeskDesk\AppInfo\Application;
 use OCP\App\IAppManager;
 use OCP\IAppConfig;
 use OCP\IGroupManager;
@@ -30,7 +34,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * Service for managing AppTemplate application configuration and settings.
+ * Service for managing DeskDesk application configuration and settings.
  */
 class SettingsService
 {
@@ -55,6 +59,8 @@ class SettingsService
      * @param LoggerInterface    $logger       The logger
      *
      * @return void
+     *
+     * @spec openspec/changes/example-change/tasks.md#task-3
      */
     public function __construct(
         private IAppConfig $appConfig,
@@ -70,6 +76,8 @@ class SettingsService
      * Check whether OpenRegister is installed and available.
      *
      * @return bool
+     *
+     * @spec openspec/changes/example-change/tasks.md#task-3
      */
     public function isOpenRegisterAvailable(): bool
     {
@@ -83,6 +91,8 @@ class SettingsService
      * fields (openregisters, isAdmin) consumed by the frontend.
      *
      * @return array<string,mixed>
+     *
+     * @spec openspec/changes/example-change/tasks.md#task-3
      */
     public function getSettings(): array
     {
@@ -109,6 +119,8 @@ class SettingsService
      * @param array<string,mixed> $data The data to update
      *
      * @return array<string,mixed> The updated settings
+     *
+     * @spec openspec/changes/example-change/tasks.md#task-3
      */
     public function updateSettings(array $data): array
     {
@@ -122,16 +134,18 @@ class SettingsService
     }//end updateSettings()
 
     /**
-     * Load configuration from app_template_register.json via OpenRegister.
+     * Load configuration from deskdesk_register.json via OpenRegister.
      *
      * @param bool $force Force re-import even if already configured.
      *
      * @return array<string,mixed> Result with success flag, message, and version.
+     *
+     * @spec openspec/changes/example-change/tasks.md#task-3
      */
     public function loadConfiguration(bool $force=false): array
     {
         if ($this->isOpenRegisterAvailable() === false) {
-            $this->logger->warning('AppTemplate: OpenRegister not available, skipping register initialization');
+            $this->logger->warning('DeskDesk: OpenRegister not available, skipping register initialization');
             return [
                 'success' => false,
                 'message' => 'OpenRegister is not installed or enabled.',
@@ -143,7 +157,7 @@ class SettingsService
             $result = $configurationService->importFromApp(appId: Application::APP_ID, force: $force);
 
             if (empty($result) === false) {
-                $this->logger->info('AppTemplate: register configuration imported successfully');
+                $this->logger->info('DeskDesk: register configuration imported successfully');
                 return [
                     'success' => true,
                     'message' => 'Configuration imported successfully.',
@@ -156,13 +170,14 @@ class SettingsService
                 'message' => 'Import returned an empty result.',
             ];
         } catch (\Throwable $e) {
+            // ADR-005: log the real error server-side, return a static generic message to clients.
             $this->logger->error(
-                'AppTemplate: configuration import failed',
-                ['exception' => $e->getMessage()]
+                'DeskDesk: configuration import failed',
+                ['exception' => $e]
             );
             return [
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => 'Configuration import failed.',
             ];
         }//end try
     }//end loadConfiguration()

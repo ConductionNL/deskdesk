@@ -1,33 +1,36 @@
 <?php
 
 /**
- * AppTemplate Initialize Settings Repair Step
+ * DeskDesk Initialize Settings Repair Step
  *
- * Repair step that initializes AppTemplate register and schemas on install/upgrade.
+ * Repair step that initializes DeskDesk register and schemas on install/upgrade.
  *
  * @category Repair
- * @package  OCA\AppTemplate\Repair
+ * @package  OCA\DeskDesk\Repair
  *
- * @author    Conduction Development Team <dev@conductio.nl>
- * @copyright 2024 Conduction B.V.
+ * @author    Conduction Development Team <info@conduction.nl>
+ * @copyright 2026 Conduction B.V.
  * @license   EUPL-1.2 https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
  *
  * @version GIT: <git-id>
  *
  * @link https://conduction.nl
+ *
+ * @spec openspec/changes/example-change/tasks.md#task-5
+ *   (Illustrative file-level @spec tag per ADR-003.)
  */
 
 declare(strict_types=1);
 
-namespace OCA\AppTemplate\Repair;
+namespace OCA\DeskDesk\Repair;
 
-use OCA\AppTemplate\Service\SettingsService;
+use OCA\DeskDesk\Service\SettingsService;
 use OCP\Migration\IOutput;
 use OCP\Migration\IRepairStep;
 use Psr\Log\LoggerInterface;
 
 /**
- * Repair step that initializes AppTemplate configuration via SettingsService.
+ * Repair step that initializes DeskDesk configuration via SettingsService.
  */
 class InitializeSettings implements IRepairStep
 {
@@ -38,6 +41,8 @@ class InitializeSettings implements IRepairStep
      * @param LoggerInterface $logger          The logger interface
      *
      * @return void
+     *
+     * @spec openspec/changes/example-change/tasks.md#task-5
      */
     public function __construct(
         private SettingsService $settingsService,
@@ -49,29 +54,33 @@ class InitializeSettings implements IRepairStep
      * Get the name of this repair step.
      *
      * @return string
+     *
+     * @spec openspec/changes/example-change/tasks.md#task-5
      */
     public function getName(): string
     {
-        return 'Initialize AppTemplate register and schemas via ConfigurationService';
+        return 'Initialize DeskDesk register and schemas via ConfigurationService';
     }//end getName()
 
     /**
-     * Run the repair step to initialize AppTemplate configuration.
+     * Run the repair step to initialize DeskDesk configuration.
      *
      * @param IOutput $output The output interface for progress reporting
      *
      * @return void
+     *
+     * @spec openspec/changes/example-change/tasks.md#task-5
      */
     public function run(IOutput $output): void
     {
-        $output->info('Initializing AppTemplate configuration...');
+        $output->info('Initializing DeskDesk configuration...');
 
         if ($this->settingsService->isOpenRegisterAvailable() === false) {
             $output->warning(
                 'OpenRegister is not installed or enabled. Skipping auto-configuration.'
             );
             $this->logger->warning(
-                'AppTemplate: OpenRegister not available, skipping register initialization'
+                'DeskDesk: OpenRegister not available, skipping register initialization'
             );
             return;
         }
@@ -82,19 +91,19 @@ class InitializeSettings implements IRepairStep
             if ($result['success'] === true) {
                 $version = ($result['version'] ?? 'unknown');
                 $output->info(
-                    'AppTemplate configuration imported successfully (version: '.$version.')'
+                    'DeskDesk configuration imported successfully (version: '.$version.')'
                 );
                 return;
             }
 
             $message = ($result['message'] ?? 'unknown error');
             $output->warning(
-                'AppTemplate configuration import issue: '.$message
+                'DeskDesk configuration import issue: '.$message
             );
         } catch (\Throwable $e) {
-            $output->warning('Could not auto-configure AppTemplate: '.$e->getMessage());
+            $output->warning('Could not auto-configure DeskDesk: '.$e->getMessage());
             $this->logger->error(
-                'AppTemplate initialization failed',
+                'DeskDesk initialization failed',
                 ['exception' => $e->getMessage()]
             );
         }//end try

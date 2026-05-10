@@ -1,17 +1,17 @@
 <!-- SPDX-License-Identifier: EUPL-1.2 -->
 <template>
-	<div class="app-template-admin">
+	<div class="deskdesk-admin">
 		<CnVersionInfoCard
-			:app-name="'App Template'"
+			:app-name="t('deskdesk', 'App template')"
 			:app-version="appVersion"
 			:is-up-to-date="true"
 			:show-update-button="true"
-			:title="t('app-template', 'Version Information')"
-			:description="t('app-template', 'Information about the current App Template installation')">
+			:title="t('deskdesk', 'Version information')"
+			:description="t('deskdesk', 'Information about the current App template installation')">
 			<template #footer>
 				<div class="cn-support-info">
-					<h4>{{ t('app-template', 'Support') }}</h4>
-					<p>{{ t('app-template', 'For support, contact us at') }} <a href="mailto:support@conduction.nl">support@conduction.nl</a></p>
+					<h4>{{ t('deskdesk', 'Support') }}</h4>
+					<p>{{ t('deskdesk', 'For support, contact us at') }} <a href="mailto:support@conduction.nl">support@conduction.nl</a></p>
 				</div>
 			</template>
 		</CnVersionInfoCard>
@@ -34,7 +34,11 @@ export default {
 	data() {
 		return {
 			storesReady: false,
-			appVersion: document.getElementById('app-template-settings')?.dataset?.version || 'Unknown',
+			// ADR-004 says "never read app state from DOM". This is a narrow exception:
+			// `appVersion` is a one-time boot parameter emitted by the PHP admin template
+			// (not user-mutable state), following Nextcloud's idiomatic settings-page
+			// bootstrap pattern. For any domain data, fetch via the store / backend API.
+			appVersion: document.getElementById('deskdesk-settings')?.dataset?.version || 'Unknown',
 		}
 	},
 	async created() {
@@ -45,7 +49,7 @@ export default {
 </script>
 
 <style scoped>
-.app-template-admin {
+.deskdesk-admin {
 	max-width: 900px;
 }
 </style>
