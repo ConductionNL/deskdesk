@@ -16,17 +16,17 @@ import './assets/app.css'
 Vue.mixin({ methods: { t, n } })
 Vue.use(PiniaVuePlugin)
 
-// Create Vue instance to activate Pinia context, then initialize stores.
+// Create Vue instance to activate Pinia context. We mount AFTER
+// initializeStores() so the manifest-driven IndexPageWrapper finds the
+// object-store types registered when its mounted() hook fires. Without
+// this await, IndexPageWrapper.mounted() races initializeStores() and
+// CnIndexPage shows "No items found" on first paint.
 const app = new Vue({
 	pinia,
 	router,
 	render: h => h(App),
 })
 
-// Mount immediately — do NOT wrap in loadTranslations() callback as it
-// blocks rendering when the l10n JSON file doesn't exist (404).
-app.$mount('#content')
-
-// Initialize stores after mount — fire-and-forget so the UI shows immediately.
-// The App.vue created() hook also awaits initializeStores() for storesReady flag.
-initializeStores()
+initializeStores().finally(() => {
+	app.$mount('#content')
+})

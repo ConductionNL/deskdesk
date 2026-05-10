@@ -49,6 +49,21 @@ class SettingsService
     ];
 
     /**
+     * Stable slug of the register declared by deskdesk_register.json.
+     *
+     * @var string
+     */
+    private const REGISTER_SLUG = 'deskdesk';
+
+    /**
+     * Schema slugs the frontend consumes. Ordered the way the manifest
+     * lists them so the resolved id map matches the menu.
+     *
+     * @var array<string>
+     */
+    private const SCHEMA_SLUGS = ['floor', 'desk', 'booking'];
+
+    /**
      * Constructor for the SettingsService.
      *
      * @param IAppConfig         $appConfig    The app config interface
@@ -104,14 +119,82 @@ class SettingsService
         $user    = $this->userSession->getUser();
         $isAdmin = ($user !== null && $this->groupManager->isAdmin($user->getUID()));
 
+        $resolved = $this->resolveRegisterIds();
+
         return array_merge(
             $settings,
             [
                 'openregisters' => $this->isOpenRegisterAvailable(),
                 'isAdmin'       => $isAdmin,
+                'registerId'    => $resolved['registerId'],
+                'registerSlug'  => self::REGISTER_SLUG,
+                'schemaIds'     => $resolved['schemaIds'],
             ]
         );
     }//end getSettings()
+
+    /**
+     * Resolve the register slug + schema slugs to numeric ids.
+     *
+     * CnIndexPage's object store queries OpenRegister at
+     * `/api/objects/{registerId}/{schemaSlug}` and the path segment must
+     * be the numeric register id, not the slug. This method resolves
+     * both the register and every schema on the way so the frontend can
+     * register object types without an extra round-trip.
+     *
+     * Returns `registerId: null` and an empty `schemaIds` map when
+     * OpenRegister isn't installed or the register hasn't been imported
+     * yet; the frontend treats `registerId === null` as "show the
+     * empty-state, prompt admin to load the configuration".
+     *
+     * @return array{registerId: int|null, schemaIds: array<string,int>}
+     */
+    private function resolveRegisterIds(): array
+    {
+        $empty = ['registerId' => null, 'schemaIds' => []];
+        if ($this->isOpenRegisterAvailable() === false) {
+            return $empty;
+        }
+
+        try {
+            $registerMapper = $this->container->get('OCA\OpenRegister\Db\RegisterMapper');
+            $register = $registerMapper->find(self::REGISTER_SLUG);
+            $registerId = (int) $register->getId();
+        } catch (\Throwable $e) {
+            // Register isn't imported yet; that's expected on first boot
+            // before the repair step has run. Log at debug level so the
+            // log doesn't fill with noise during fresh installs.
+            $this->logger->debug(
+                'DeskDesk: register slug not resolved yet',
+                ['exception' => $e]
+            );
+            return $empty;
+        }
+
+        $schemaIds = [];
+        try {
+            $schemaMapper = $this->container->get('OCA\OpenRegister\Db\SchemaMapper');
+            foreach (self::SCHEMA_SLUGS as $slug) {
+                try {
+                    $schemaIds[$slug] = (int) $schemaMapper->find($slug)->getId();
+                } catch (\Throwable $e) {
+                    // Missing schema is non-fatal; the frontend will skip
+                    // any object type whose id is absent.
+                    $this->logger->debug(
+                        'DeskDesk: schema slug not resolved',
+                        ['slug' => $slug, 'exception' => $e]
+                    );
+                }
+            }
+        } catch (\Throwable $e) {
+            $this->logger->debug(
+                'DeskDesk: schema mapper unavailable',
+                ['exception' => $e]
+            );
+        }
+
+        return ['registerId' => $registerId, 'schemaIds' => $schemaIds];
+    }//end resolveRegisterIds()
 
     /**
      * Update settings with the provided data.

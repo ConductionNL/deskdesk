@@ -1,15 +1,14 @@
 // SPDX-License-Identifier: EUPL-1.2
 //
 // Store initialisation — called once from main.js after Vue mounts.
-// Fetches settings, then registers each DeskDesk entity type with the
-// shared object store so CnIndexPage / CnDetailPage can fetch them by
-// slug. The register id is `deskdesk` (matching <id> in info.xml and
-// the x-openregister.app field in lib/Settings/deskdesk_register.json).
+// Fetches settings (which now include the numeric register id resolved
+// by SettingsService::resolveRegisterIds()), then registers each
+// DeskDesk schema with the shared object store so CnIndexPage /
+// CnDetailPage can hit /api/objects/{registerId}/{schemaSlug}.
 
 import { useObjectStore } from './modules/object.js'
 import { useSettingsStore } from './modules/settings.js'
 
-const REGISTER = 'deskdesk'
 const SCHEMAS = ['floor', 'desk', 'booking']
 
 export async function initializeStores() {
@@ -18,7 +17,15 @@ export async function initializeStores() {
 
 	const config = await settingsStore.fetchSettings()
 
-	const registerId = (config && config.register) || REGISTER
+	// The backend resolves the deskdesk register slug to a numeric id and
+	// puts it on `config.registerId` (see SettingsService::getSettings()).
+	// When the register hasn't been imported yet the id is null; skip the
+	// type registration and let CnAppRoot's dependency-check phase show
+	// the empty-state UI prompting an admin to run the import.
+	const registerId = config?.registerId
+	if (!registerId) {
+		return { settingsStore, objectStore }
+	}
 
 	for (const schema of SCHEMAS) {
 		objectStore.registerObjectType(schema, schema, registerId)
