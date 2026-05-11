@@ -9,7 +9,7 @@
 import { useObjectStore } from './modules/object.js'
 import { useSettingsStore } from './modules/settings.js'
 
-const SCHEMAS = ['floor', 'desk', 'booking']
+const SCHEMAS = ['floor', 'desk', 'booking', 'knowledge_article']
 
 export async function initializeStores() {
 	const settingsStore = useSettingsStore()

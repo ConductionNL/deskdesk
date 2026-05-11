@@ -2,8 +2,8 @@
   "openapi": "3.0.0",
   "info": {
     "title": "DeskDesk Register",
-    "description": "Register containing all schemas for the DeskDesk application — floors, desks, and bookings.",
-    "version": "0.2.0"
+    "description": "Register containing all schemas for the DeskDesk application — floors, desks, bookings, and knowledge articles.",
+    "version": "0.3.0"
   },
   "x-openregister": {
     "type": "application",
@@ -167,6 +167,44 @@
             "example": "FREQ=WEEKLY;BYDAY=MO,WE,FR;COUNT=12"
           }
         }
+      },
+      "knowledge_article": {
+        "slug": "knowledge_article",
+        "icon": "BookOpenVariantOutline",
+        "version": "0.1.0",
+        "title": "Knowledge article",
+        "description": "An external knowledge article surfaced in DeskDesk via OpenConnector. The canonical source lives in xWiki (or any wiki / docs system OpenConnector can target). DeskDesk treats these objects as read-only; sync is one-way wiki -> OpenRegister.",
+        "type": "object",
+        "required": ["name", "zone"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Article title.",
+            "example": "East zone etiquette"
+          },
+          "zone": {
+            "type": "string",
+            "enum": ["north", "south", "east", "west", "central"],
+            "description": "Zone this article applies to. Matches the desk.zone enum so a desk's detail page can surface articles for its own zone.",
+            "example": "east"
+          },
+          "body": {
+            "type": "string",
+            "description": "Article body. xWiki syntax (xwiki/2.1) on the wiki side; the sync stores it as a plain string here. CnObjectSidebar's knowledge tab renders it with the wiki-syntax pass-through.",
+            "example": "The east windows get direct sun 14:00 to 17:00 in summer..."
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Permalink back to the wiki page so users can edit at the source.",
+            "example": "http://localhost:8086/xwiki/bin/view/DeskDeskKnowledge/East/Etiquette"
+          },
+          "externalId": {
+            "type": "string",
+            "description": "Wiki page id used by the OpenConnector synchronisation to dedupe across runs.",
+            "example": "xwiki:DeskDeskKnowledge.East.Etiquette"
+          }
+        }
       }
     },
     "objects": {
@@ -280,6 +318,42 @@
         "end": "2026-05-14T13:00:00+02:00",
         "purpose": "Quiet morning",
         "status": "tentative"
+      },
+      "knowledge-east-etiquette": {
+        "@self": {
+          "register": "deskdesk",
+          "schema": "knowledge_article",
+          "slug": "knowledge-east-etiquette"
+        },
+        "name": "East zone etiquette",
+        "zone": "east",
+        "body": "The east windows get direct sun 14:00 to 17:00 in summer. Bring a curtain clip from the supplies cabinet on floor 3. Phone calls are fine in this zone, phonebooths are a 30-second walk away.",
+        "url": "http://localhost:8086/xwiki/bin/view/DeskDeskKnowledge/East/Etiquette",
+        "externalId": "xwiki:DeskDeskKnowledge.East.Etiquette"
+      },
+      "knowledge-central-meeting-desks": {
+        "@self": {
+          "register": "deskdesk",
+          "schema": "knowledge_article",
+          "slug": "knowledge-central-meeting-desks"
+        },
+        "name": "Central zone meeting desks",
+        "zone": "central",
+        "body": "Central desks 11 to 14 seat four. The cabling channel under each desk has two HDMI ports and USB-C 100W power. Camera and mic in the ceiling are wired into the in-room Jitsi instance. See the QR code on the desk.",
+        "url": "http://localhost:8086/xwiki/bin/view/DeskDeskKnowledge/Central/MeetingDesks",
+        "externalId": "xwiki:DeskDeskKnowledge.Central.MeetingDesks"
+      },
+      "knowledge-west-quiet-rules": {
+        "@self": {
+          "register": "deskdesk",
+          "schema": "knowledge_article",
+          "slug": "knowledge-west-quiet-rules"
+        },
+        "name": "West zone quiet rules",
+        "zone": "west",
+        "body": "The west zone is the designated quiet zone. No calls, no meetings. Keep notifications muted. The kitchen is on the opposite side of the floor for a reason.",
+        "url": "http://localhost:8086/xwiki/bin/view/DeskDeskKnowledge/West/QuietRules",
+        "externalId": "xwiki:DeskDeskKnowledge.West.QuietRules"
       }
     }
   }

@@ -48,7 +48,27 @@
       "title": "deskdesk.desks.detailTitle",
       "config": {
         "register": "deskdesk",
-        "schema": "desk"
+        "schema": "desk",
+        "sidebar": {
+          "tabs": [
+            {
+              "id": "data",
+              "label": "deskdesk.sidebar.data",
+              "widgets": [{"type": "data"}]
+            },
+            {
+              "id": "knowledge",
+              "label": "deskdesk.sidebar.knowledge",
+              "icon": "BookOpenVariantOutline",
+              "component": "knowledge-tab"
+            },
+            {
+              "id": "metadata",
+              "label": "deskdesk.sidebar.metadata",
+              "widgets": [{"type": "metadata"}]
+            }
+          ]
+        }
       }
     },
     {
