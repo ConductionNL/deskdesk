@@ -61,7 +61,7 @@ class SettingsService
      *
      * @var array<string>
      */
-    private const SCHEMA_SLUGS = ['floor', 'desk', 'booking'];
+    private const SCHEMA_SLUGS = ['floor', 'desk', 'booking', 'knowledge_article'];
 
     /**
      * Constructor for the SettingsService.
