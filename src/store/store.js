@@ -1,11 +1,16 @@
 // SPDX-License-Identifier: EUPL-1.2
 //
 // Store initialisation — called once from main.js after Vue mounts.
-// Fetches settings, then registers each entity type with the object store.
-// Add one registerObjectType() call per entity your app manages.
+// Fetches settings, then registers each DeskDesk entity type with the
+// shared object store so CnIndexPage / CnDetailPage can fetch them by
+// slug. The register id is `deskdesk` (matching <id> in info.xml and
+// the x-openregister.app field in lib/Settings/deskdesk_register.json).
 
 import { useObjectStore } from './modules/object.js'
 import { useSettingsStore } from './modules/settings.js'
+
+const REGISTER = 'deskdesk'
+const SCHEMAS = ['floor', 'desk', 'booking']
 
 export async function initializeStores() {
 	const settingsStore = useSettingsStore()
@@ -13,17 +18,10 @@ export async function initializeStores() {
 
 	const config = await settingsStore.fetchSettings()
 
-	if (config) {
-		// Register each entity type: (typeName, schemaId, registerId)
-		// The schema and register IDs come from the settings API.
-		objectStore.registerObjectType(
-			'item',
-			config.item_schema || 'item',
-			config.register || 'deskdesk',
-		)
+	const registerId = (config && config.register) || REGISTER
 
-		// Add more entity types here as your app grows:
-		// objectStore.registerObjectType('category', config.category_schema || 'category', config.register || 'deskdesk')
+	for (const schema of SCHEMAS) {
+		objectStore.registerObjectType(schema, schema, registerId)
 	}
 
 	return { settingsStore, objectStore }

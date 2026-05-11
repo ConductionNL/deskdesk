@@ -153,15 +153,36 @@ class SettingsService
         }
 
         try {
+            // Resolve the bundled register file relative to the Nextcloud root,
+            // matching ConfigurationService::importFromFilePath's expectation
+            // (path relative to /var/www/html).
+            $appPath = (string) $this->appManager->getAppPath(Application::APP_ID);
+            $absolute = $appPath.'/lib/Settings/deskdesk_register.json';
+            $ncRoot = \OC::$SERVERROOT;
+            $relative = (str_starts_with($absolute, $ncRoot.'/') === true)
+                ? substr($absolute, strlen($ncRoot) + 1)
+                : ltrim($absolute, '/');
+
+            $version = '0.2.0';
+            if (file_exists($absolute) === true) {
+                $payload = json_decode((string) file_get_contents($absolute), true);
+                $version = (string) ($payload['info']['version'] ?? $version);
+            }
+
             $configurationService = $this->container->get('OCA\OpenRegister\Service\ConfigurationService');
-            $result = $configurationService->importFromApp(appId: Application::APP_ID, force: $force);
+            $result = $configurationService->importFromFilePath(
+                appId: Application::APP_ID,
+                filePath: $relative,
+                version: $version,
+                force: $force
+            );
 
             if (empty($result) === false) {
                 $this->logger->info('DeskDesk: register configuration imported successfully');
                 return [
                     'success' => true,
                     'message' => 'Configuration imported successfully.',
-                    'version' => ($result['version'] ?? 'unknown'),
+                    'version' => $version,
                 ];
             }
 

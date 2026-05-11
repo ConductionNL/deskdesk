@@ -2,12 +2,12 @@
 <template>
 	<div class="deskdesk-admin">
 		<CnVersionInfoCard
-			:app-name="t('deskdesk', 'App template')"
+			:app-name="t('deskdesk', 'DeskDesk')"
 			:app-version="appVersion"
 			:is-up-to-date="true"
-			:show-update-button="true"
+			:show-update-button="false"
 			:title="t('deskdesk', 'Version information')"
-			:description="t('deskdesk', 'Information about the current App template installation')">
+			:description="t('deskdesk', 'Information about the current DeskDesk installation')">
 			<template #footer>
 				<div class="cn-support-info">
 					<h4>{{ t('deskdesk', 'Support') }}</h4>
@@ -15,35 +15,24 @@
 				</div>
 			</template>
 		</CnVersionInfoCard>
-
-		<Settings v-if="storesReady" />
 	</div>
 </template>
 
 <script>
 import { CnVersionInfoCard } from '@conduction/nextcloud-vue'
-import Settings from './Settings.vue'
-import { initializeStores } from '../../store/store.js'
 
 export default {
 	name: 'AdminRoot',
 	components: {
 		CnVersionInfoCard,
-		Settings,
 	},
 	data() {
 		return {
-			storesReady: false,
-			// ADR-004 says "never read app state from DOM". This is a narrow exception:
-			// `appVersion` is a one-time boot parameter emitted by the PHP admin template
-			// (not user-mutable state), following Nextcloud's idiomatic settings-page
-			// bootstrap pattern. For any domain data, fetch via the store / backend API.
+			// ADR-004: "never read app state from DOM" exception — appVersion
+			// is a one-time boot parameter emitted by the PHP admin template,
+			// following Nextcloud's idiomatic settings-page bootstrap pattern.
 			appVersion: document.getElementById('deskdesk-settings')?.dataset?.version || 'Unknown',
 		}
-	},
-	async created() {
-		await initializeStores()
-		this.storesReady = true
 	},
 }
 </script>
