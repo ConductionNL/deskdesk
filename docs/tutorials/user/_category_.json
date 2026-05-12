@@ -1,0 +1,11 @@
+{
+  "label": "User guide",
+  "position": 1,
+  "collapsible": true,
+  "collapsed": false,
+  "link": {
+    "type": "generated-index",
+    "title": "User guide",
+    "description": "Workflows for individual users — opening the app, browsing desks by floor and zone, booking a slot, setting up a recurring booking, seeing bookings in Nextcloud Calendar, and reading the how-to articles for a desk."
+  }
+}
