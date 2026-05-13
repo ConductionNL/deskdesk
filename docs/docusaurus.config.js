@@ -64,7 +64,7 @@ const config = createConfig({
              plus the standard node_modules bucket. */
           exclude: ['**/node_modules/**', 'src/**'],
           sidebarPath: require.resolve('./sidebars.js'),
-          editUrl: 'https://github.com/ConductionNL/deskdesk/tree/main/docs/',
+          editUrl: 'https://github.com/ConductionNL/deskdesk/tree/development/docs/',
         },
         blog: false,
         theme: {
