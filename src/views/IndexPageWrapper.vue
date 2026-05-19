@@ -54,12 +54,12 @@ export default {
 	// CnPageRenderer spreads page.config onto whichever component the
 	// pageType dispatches to.
 	props: {
-		register:    { type: [String, Number], default: '' },
-		schema:      { type: String, required: true },
-		columns:     { type: Array, default: () => [] },
-		filters:     { type: Array, default: () => [] },
+		register: { type: [String, Number], default: '' },
+		schema: { type: String, required: true },
+		columns: { type: Array, default: () => [] },
+		filters: { type: Array, default: () => [] },
 		defaultSort: { type: Object, default: () => ({ key: null, order: 'asc' }) },
-		title:       { type: String, default: '' },
+		title: { type: String, default: '' },
 		description: { type: String, default: '' },
 	},
 
