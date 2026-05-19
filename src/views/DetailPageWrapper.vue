@@ -41,14 +41,14 @@ export default {
 	components: { CnDetailPage, CnObjectDataWidget },
 
 	props: {
-		register:    { type: [String, Number], default: '' },
-		schema:      { type: String, required: true },
-		sidebar:     { type: [Boolean, Object], default: false },
-		sidebarProps:{ type: Object, default: () => ({}) },
-		title:       { type: String, default: '' },
+		register: { type: [String, Number], default: '' },
+		schema: { type: String, required: true },
+		sidebar: { type: [Boolean, Object], default: false },
+		sidebarProps: { type: Object, default: () => ({}) },
+		title: { type: String, default: '' },
 		description: { type: String, default: '' },
 		// Route params (forwarded by CnPageRenderer via { ...$route.params }).
-		id:          { type: String, default: '' },
+		id: { type: String, default: '' },
 	},
 
 	setup() {

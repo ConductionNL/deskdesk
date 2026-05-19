@@ -32,11 +32,16 @@
 		<article v-for="article in articles" :key="article.id" class="knowledge-tab__article">
 			<header class="knowledge-tab__head">
 				<h3>{{ article.name }}</h3>
-				<a v-if="article.url" :href="article.url" target="_blank" rel="noopener noreferrer">
+				<a v-if="article.url"
+					:href="article.url"
+					target="_blank"
+					rel="noopener noreferrer">
 					{{ t('deskdesk', 'Open in wiki') }} ↗
 				</a>
 			</header>
-			<p class="knowledge-tab__body">{{ article.body }}</p>
+			<p class="knowledge-tab__body">
+				{{ article.body }}
+			</p>
 		</article>
 	</div>
 </template>
