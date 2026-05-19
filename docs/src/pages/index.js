@@ -355,7 +355,7 @@ const WIDGETS = [
 export default function Home() {
   return (
     <Layout
-      title="DeskDesk"
+      title="DeskDesk, flexible desk booking on Nextcloud"
       description="DeskDesk runs flexible desk booking for open-office environments — pick a desk on a floor, book a slot, sync to Nextcloud Calendar, and surface booking how-tos from the company wiki."
     >
       <main className="marketing-page">

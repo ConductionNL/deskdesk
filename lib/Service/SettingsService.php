@@ -158,8 +158,8 @@ class SettingsService
 
         try {
             $registerMapper = $this->container->get('OCA\OpenRegister\Db\RegisterMapper');
-            $register = $registerMapper->find(self::REGISTER_SLUG);
-            $registerId = (int) $register->getId();
+            $register       = $registerMapper->find(self::REGISTER_SLUG);
+            $registerId     = (int) $register->getId();
         } catch (\Throwable $e) {
             // Register isn't imported yet; that's expected on first boot
             // before the repair step has run. Log at debug level so the
@@ -239,12 +239,14 @@ class SettingsService
             // Resolve the bundled register file relative to the Nextcloud root,
             // matching ConfigurationService::importFromFilePath's expectation
             // (path relative to /var/www/html).
-            $appPath = (string) $this->appManager->getAppPath(Application::APP_ID);
+            $appPath  = (string) $this->appManager->getAppPath(Application::APP_ID);
             $absolute = $appPath.'/lib/Settings/deskdesk_register.json';
-            $ncRoot = \OC::$SERVERROOT;
-            $relative = (str_starts_with($absolute, $ncRoot.'/') === true)
-                ? substr($absolute, strlen($ncRoot) + 1)
-                : ltrim($absolute, '/');
+            $ncRoot   = \OC::$SERVERROOT;
+            if (str_starts_with($absolute, $ncRoot.'/') === true) {
+                $relative = substr($absolute, strlen($ncRoot) + 1);
+            } else {
+                $relative = ltrim($absolute, '/');
+            }
 
             $version = '0.2.0';
             if (file_exists($absolute) === true) {
