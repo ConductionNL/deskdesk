@@ -209,7 +209,7 @@ class ItemServiceTest extends TestCase
     private function arrangeOpenRegister(): void
     {
         $this->appManager->method('isInstalled')->willReturn(true);
-        $this->appConfig->method('getValueString')->willReturn('app-template');
+        $this->appConfig->method('getValueString')->willReturn('deskdesk');
         $this->container->method('get')->willReturn($this->objectService);
     }//end arrangeOpenRegister()
 
