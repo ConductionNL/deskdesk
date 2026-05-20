@@ -8,7 +8,7 @@
  * security-critical branches.
  *
  * @category Test
- * @package  OCA\AppTemplate\Tests\Unit\Service
+ * @package  OCA\DeskDesk\Tests\Unit\Service
  *
  * @author    Conduction Development Team <info@conduction.nl>
  * @copyright 2026 Conduction B.V.
@@ -23,9 +23,9 @@
 
 declare(strict_types=1);
 
-namespace OCA\AppTemplate\Tests\Unit\Service;
+namespace OCA\DeskDesk\Tests\Unit\Service;
 
-use OCA\AppTemplate\Service\ItemService;
+use OCA\DeskDesk\Service\ItemService;
 use OCP\App\IAppManager;
 use OCP\IAppConfig;
 use OCP\IGroupManager;
@@ -209,7 +209,7 @@ class ItemServiceTest extends TestCase
     private function arrangeOpenRegister(): void
     {
         $this->appManager->method('isInstalled')->willReturn(true);
-        $this->appConfig->method('getValueString')->willReturn('app-template');
+        $this->appConfig->method('getValueString')->willReturn('deskdesk');
         $this->container->method('get')->willReturn($this->objectService);
     }//end arrangeOpenRegister()
 
