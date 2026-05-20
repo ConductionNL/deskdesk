@@ -8,7 +8,7 @@
  * (the actual auth check) lives in ItemService.
  *
  * @category Test
- * @package  OCA\AppTemplate\Tests\Unit\Controller
+ * @package  OCA\DeskDesk\Tests\Unit\Controller
  *
  * @author    Conduction Development Team <info@conduction.nl>
  * @copyright 2026 Conduction B.V.
@@ -23,10 +23,10 @@
 
 declare(strict_types=1);
 
-namespace OCA\AppTemplate\Tests\Unit\Controller;
+namespace OCA\DeskDesk\Tests\Unit\Controller;
 
-use OCA\AppTemplate\Controller\ItemController;
-use OCA\AppTemplate\Service\ItemService;
+use OCA\DeskDesk\Controller\ItemController;
+use OCA\DeskDesk\Service\ItemService;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\IRequest;
