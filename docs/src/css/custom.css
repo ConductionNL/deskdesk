@@ -9,8 +9,8 @@
 
 /* You can override the default Infima variables here. */
 :root {
-  /* Primary color: Conduction Cobalt (matches hexagon logo #4376FC) */
-  --ifm-color-primary: #4376FC;
+  /* Primary color: Conduction Cobalt (matches hexagon logo #21468B) */
+  --ifm-color-primary: #21468B;
   --ifm-color-primary-dark: #2a62fb;
   --ifm-color-primary-darker: #1d57fb;
   --ifm-color-primary-darkest: #053fe8;
@@ -37,7 +37,7 @@
 [data-theme='dark'] {
   /* Primary colors */
   --ifm-color-primary: #6a96fd;
-  --ifm-color-primary-dark: #4376FC;
+  --ifm-color-primary-dark: #21468B;
   --ifm-color-primary-darker: #2a62fb;
   --ifm-color-primary-darkest: #1d57fb;
   --ifm-color-primary-light: #80a6fd;
