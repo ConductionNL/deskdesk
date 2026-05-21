@@ -242,10 +242,9 @@ class SettingsService
             $appPath  = (string) $this->appManager->getAppPath(Application::APP_ID);
             $absolute = $appPath.'/lib/Settings/deskdesk_register.json';
             $ncRoot   = \OC::$SERVERROOT;
+            $relative = ltrim($absolute, '/');
             if (str_starts_with($absolute, $ncRoot.'/') === true) {
                 $relative = substr($absolute, strlen($ncRoot) + 1);
-            } else {
-                $relative = ltrim($absolute, '/');
             }
 
             $version = '0.2.0';

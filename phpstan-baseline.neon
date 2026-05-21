@@ -1,0 +1,9 @@
+# phpstan baseline generated during Phase 2 canonical root-config sync.
+# Each entry tracked in https://github.com/ConductionNL/deskdesk/issues/32 —
+# do NOT add new entries here without a checkbox in that issue.
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Access to static property \\$SERVERROOT on an unknown class OC\\.$#"
+			count: 1
+			path: lib/Service/SettingsService.php
