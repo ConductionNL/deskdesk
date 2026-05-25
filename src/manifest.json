@@ -23,6 +23,22 @@
       "icon": "icon-category-monitoring",
       "route": "floors-index",
       "order": 30
+    },
+    {
+      "id": "Documentation",
+      "label": "Documentation",
+      "icon": "icon-info",
+      "href": "https://deskdesk.conduction.nl",
+      "section": "footer",
+      "order": 90
+    },
+    {
+      "id": "FeaturesRoadmapMenu",
+      "label": "Features & roadmap",
+      "icon": "icon-toggle",
+      "route": "FeaturesRoadmap",
+      "section": "footer",
+      "order": 91
     }
   ],
   "pages": [
@@ -115,6 +131,15 @@
         "register": "deskdesk",
         "schema": "floor",
         "sidebar": true
+      }
+    },
+    {
+      "id": "FeaturesRoadmap",
+      "route": "/features-roadmap",
+      "type": "roadmap",
+      "title": "Features & roadmap",
+      "config": {
+        "documentationUrl": "https://deskdesk.conduction.nl"
       }
     }
   ]
