@@ -11,6 +11,9 @@ import { useSettingsStore } from './modules/settings.js'
 
 const SCHEMAS = ['floor', 'desk', 'booking', 'knowledge_article']
 
+/**
+ * @spec exclude academy tutorial demo — store bootstrap glue registering object types after settings load, no spec-worthy behavior
+ */
 export async function initializeStores() {
 	const settingsStore = useSettingsStore()
 	const objectStore = useObjectStore()

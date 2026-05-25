@@ -5,8 +5,6 @@
 // - Loading state managed with try/finally
 // - Errors logged; callers are expected to wrap `await store.action()` in try/catch
 //   with user-facing feedback.
-//
-// @spec openspec/changes/example-change/tasks.md#task-11
 
 import { defineStore } from 'pinia'
 import { generateUrl } from '@nextcloud/router'
@@ -26,6 +24,9 @@ export const useSettingsStore = defineStore('settings', {
 	},
 
 	actions: {
+		/**
+		 * @spec exclude academy tutorial demo — settings GET illustrating the ADR-004 axios/loading pattern, not spec-worthy behavior
+		 */
 		async fetchSettings() {
 			this.loading = true
 			try {
@@ -42,6 +43,9 @@ export const useSettingsStore = defineStore('settings', {
 			}
 		},
 
+		/**
+		 * @spec exclude academy tutorial demo — settings POST illustrating the ADR-004 axios/loading pattern, not spec-worthy behavior
+		 */
 		async saveSettings(settings) {
 			this.loading = true
 			try {

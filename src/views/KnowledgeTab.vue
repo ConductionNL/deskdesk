@@ -59,6 +59,9 @@ export default {
 		objectType: { type: String, default: 'desk' },
 	},
 
+	/**
+	 * @spec exclude academy tutorial demo — exposes the shared object store to the knowledge tab, no spec-worthy behavior
+	 */
 	setup() {
 		return { objectStore: useObjectStore() }
 	},
@@ -68,6 +71,9 @@ export default {
 	},
 
 	computed: {
+		/**
+		 * @spec exclude academy tutorial demo — static empty-state copy for the tutorial knowledge tab, no spec-worthy behavior
+		 */
 		emptyDescription() {
 			return this.t('deskdesk', 'Write one in your wiki, tag it with the desk zone, and it will appear here on the next sync.')
 		},
@@ -76,6 +82,9 @@ export default {
 	watch: {
 		objectId: {
 			immediate: true,
+			/**
+			 * @spec exclude academy tutorial demo — reloads articles when the watched desk id changes, no spec-worthy behavior
+			 */
 			async handler() {
 				await this.load()
 			},
@@ -83,6 +92,9 @@ export default {
 	},
 
 	methods: {
+		/**
+		 * @spec exclude academy tutorial demo — fetches zone-scoped knowledge_article objects for the tutorial sidebar tab, no spec-worthy behavior
+		 */
 		async load() {
 			this.loading = true
 			try {
