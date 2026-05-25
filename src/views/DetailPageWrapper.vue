@@ -51,6 +51,9 @@ export default {
 		id: { type: String, default: '' },
 	},
 
+	/**
+	 * @spec exclude academy tutorial demo — exposes the shared object store to the manifest-bridge wrapper, no spec-worthy behavior
+	 */
 	setup() {
 		return { objectStore: useObjectStore() }
 	},
@@ -62,6 +65,9 @@ export default {
 	watch: {
 		id: {
 			immediate: true,
+			/**
+			 * @spec exclude academy tutorial demo — fetches the detail object when the route id changes, no spec-worthy behavior
+			 */
 			async handler() {
 				if (!this.id) return
 				this.loading = true

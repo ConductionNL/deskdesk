@@ -63,6 +63,9 @@ export default {
 		description: { type: String, default: '' },
 	},
 
+	/**
+	 * @spec exclude academy tutorial demo — wires useListView() onto the manifest-bridge index wrapper, no spec-worthy behavior
+	 */
 	setup(props) {
 		const objectStore = useObjectStore()
 		const listView = useListView(props.schema, {
