@@ -19,6 +19,7 @@
 </template>
 
 <script>
+import { loadState } from '@nextcloud/initial-state'
 import { CnVersionInfoCard } from '@conduction/nextcloud-vue'
 
 export default {
@@ -28,10 +29,7 @@ export default {
 	},
 	data() {
 		return {
-			// ADR-004: "never read app state from DOM" exception — appVersion
-			// is a one-time boot parameter emitted by the PHP admin template,
-			// following Nextcloud's idiomatic settings-page bootstrap pattern.
-			appVersion: document.getElementById('deskdesk-settings')?.dataset?.version || 'Unknown',
+			appVersion: loadState('deskdesk', 'version', 'Unknown'),
 		}
 	},
 }
