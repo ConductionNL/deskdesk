@@ -28,8 +28,12 @@ namespace OCA\DeskDesk\Controller;
 use OCA\DeskDesk\AppInfo\Application;
 use OCA\DeskDesk\Service\SettingsService;
 use OCP\AppFramework\Controller;
+use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\Attribute\AuthorizedAdminSetting;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\IRequest;
+use OCP\IUserSession;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -46,6 +50,7 @@ class SettingsController extends Controller
      *
      * @param IRequest        $request         The request object
      * @param SettingsService $settingsService The settings service
+     * @param IUserSession    $userSession     The user session
      * @param LoggerInterface $logger          The logger (for server-side error logging)
      *
      * @return void
@@ -55,6 +60,7 @@ class SettingsController extends Controller
     public function __construct(
         IRequest $request,
         private SettingsService $settingsService,
+        private IUserSession $userSession,
         private LoggerInterface $logger,
     ) {
         parent::__construct(appName: Application::APP_ID, request: $request);
@@ -63,14 +69,23 @@ class SettingsController extends Controller
     /**
      * Retrieve all current settings.
      *
-     * @NoAdminRequired
+     * Any logged-in user may read settings (register IDs, schema IDs,
+     * OpenRegister availability, isAdmin flag) — the data drives the SPA's
+     * empty-state and object-store configuration. Not admin-gated because
+     * the frontend needs this on initial load before an admin check.
      *
      * @return JSONResponse
      *
      * @spec openspec/changes/example-change/tasks.md#task-2
      */
+    #[NoAdminRequired]
     public function index(): JSONResponse
     {
+        $user = $this->userSession->getUser();
+        if ($user === null) {
+            return new JSONResponse(['message' => 'Authentication required'], Http::STATUS_UNAUTHORIZED);
+        }
+
         try {
             return new JSONResponse(
                 $this->settingsService->getSettings()
@@ -87,13 +102,14 @@ class SettingsController extends Controller
     /**
      * Update settings with provided data.
      *
-     * Admin-only (no `#[NoAdminRequired]`) — writing app configuration is an
-     * admin action per ADR-005.
+     * Admin-only — writing app configuration is an admin action per ADR-005.
+     * Enforced via AuthorizedAdminSetting middleware attribute.
      *
      * @return JSONResponse
      *
      * @spec openspec/changes/example-change/tasks.md#task-2
      */
+    #[AuthorizedAdminSetting(Application::APP_ID)]
     public function create(): JSONResponse
     {
         try {
@@ -119,12 +135,14 @@ class SettingsController extends Controller
      * Re-import the configuration from deskdesk_register.json.
      *
      * Forces a fresh import regardless of version, auto-configuring
-     * all schema and register IDs from the import result. Admin-only.
+     * all schema and register IDs from the import result. Admin-only —
+     * enforced via AuthorizedAdminSetting middleware attribute.
      *
      * @return JSONResponse
      *
      * @spec openspec/changes/example-change/tasks.md#task-2
      */
+    #[AuthorizedAdminSetting(Application::APP_ID)]
     public function load(): JSONResponse
     {
         try {

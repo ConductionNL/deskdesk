@@ -29,6 +29,8 @@ use OCA\DeskDesk\AppInfo\Application;
 use OCA\DeskDesk\Service\SettingsService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\Attribute\AuthorizedAdminSetting;
+use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\DataDisplayResponse;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
@@ -38,7 +40,7 @@ use Psr\Log\LoggerInterface;
  *
  * Returns `text/plain; version=0.0.4` with `{app}_` prefixed metrics.
  * MUST include `{app}_health_status` and `{app}_info` per ADR-006.
- * Admin-only (no `#[NoAdminRequired]`) — ADR-006 mandates admin auth.
+ * Admin-only — ADR-006 mandates admin auth; enforced via AuthorizedAdminSetting.
  */
 class MetricsController extends Controller
 {
@@ -75,6 +77,8 @@ class MetricsController extends Controller
      *
      * @spec openspec/changes/example-change/tasks.md#task-8
      */
+    #[AuthorizedAdminSetting(Application::APP_ID)]
+    #[NoCSRFRequired]
     public function index(): DataDisplayResponse
     {
         try {
