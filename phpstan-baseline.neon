@@ -7,3 +7,13 @@ parameters:
 			message: "#^Access to static property \\$SERVERROOT on an unknown class OC\\.$#"
 			count: 1
 			path: lib/Service/SettingsService.php
+
+		-
+			message: "#^Parameter \\#1 \\$settings of attribute class OCP\\\\AppFramework\\\\Http\\\\Attribute\\\\AuthorizedAdminSetting constructor expects class\\-string\\<OCP\\\\Settings\\\\IDelegatedSettings\\>, string given\\.$#"
+			count: 2
+			path: lib/Controller/SettingsController.php
+
+		-
+			message: "#^Parameter \\#1 \\$settings of attribute class OCP\\\\AppFramework\\\\Http\\\\Attribute\\\\AuthorizedAdminSetting constructor expects class\\-string\\<OCP\\\\Settings\\\\IDelegatedSettings\\>, string given\\.$#"
+			count: 1
+			path: lib/Controller/MetricsController.php
