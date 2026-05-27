@@ -284,6 +284,54 @@ class SettingsServiceTest extends TestCase
     }//end testUpdateSettingsIgnoresUnknownKeys()
 
     /**
+     * getSettings() includes schemaIds for admin users (needed to configure
+     * the object store) and omits it for non-admin users (reduce enumeration
+     * surface — issue #55).
+     *
+     * @return void
+     *
+     * @spec openspec/changes/example-change/tasks.md#task-3
+     */
+    public function testGetSettingsIncludesSchemaIdsForAdmin(): void
+    {
+        $user = $this->createMock(IUser::class);
+        $user->method('getUID')->willReturn('alice');
+
+        $this->appConfig->method('getValueString')->willReturn('');
+        $this->userSession->method('getUser')->willReturn($user);
+        $this->groupManager->method('isAdmin')->with('alice')->willReturn(true);
+        $this->appManager->method('isInstalled')->willReturn(false);
+
+        $result = $this->service->getSettings();
+
+        self::assertArrayHasKey('schemaIds', $result, 'Admin must receive schemaIds');
+
+    }//end testGetSettingsIncludesSchemaIdsForAdmin()
+
+    /**
+     * getSettings() omits schemaIds for non-admin users.
+     *
+     * @return void
+     *
+     * @spec openspec/changes/example-change/tasks.md#task-3
+     */
+    public function testGetSettingsOmitsSchemaIdsForNonAdmin(): void
+    {
+        $user = $this->createMock(IUser::class);
+        $user->method('getUID')->willReturn('bob');
+
+        $this->appConfig->method('getValueString')->willReturn('');
+        $this->userSession->method('getUser')->willReturn($user);
+        $this->groupManager->method('isAdmin')->with('bob')->willReturn(false);
+        $this->appManager->method('isInstalled')->willReturn(false);
+
+        $result = $this->service->getSettings();
+
+        self::assertArrayNotHasKey('schemaIds', $result, 'Non-admin must NOT receive schemaIds');
+
+    }//end testGetSettingsOmitsSchemaIdsForNonAdmin()
+
+    /**
      * loadConfiguration() short-circuits when OpenRegister is missing and
      * logs a warning (per ADR-001: OpenRegister is the data layer, not a hard
      * dep — the app must degrade gracefully).
@@ -368,17 +416,20 @@ class SettingsServiceTest extends TestCase
     public function testLoadConfigurationCatchesThrowableAndReturnsGenericMessage(): void
     {
         $this->appManager->method('isInstalled')->willReturn(true);
+        $this->appManager->method('getAppPath')->willReturn('/tmp/deskdesk-test-app');
 
         $configurationService = new class {
             /**
              * Throws to exercise the Throwable-caught branch.
              *
-             * @param string $appId The app ID.
-             * @param bool   $force Whether to force re-import.
+             * @param string $appId    The app ID.
+             * @param string $filePath The file path.
+             * @param string $version  The version.
+             * @param bool   $force    Whether to force re-import.
              *
              * @return array<string,mixed>
              */
-            public function importFromApp(string $appId, bool $force): array
+            public function importFromFilePath(string $appId, string $filePath, string $version, bool $force): array
             {
                 throw new \RuntimeException('db exploded — host=secret.internal');
             }
@@ -399,4 +450,44 @@ class SettingsServiceTest extends TestCase
         self::assertStringNotContainsString('exploded', $result['message']);
 
     }//end testLoadConfigurationCatchesThrowableAndReturnsGenericMessage()
+
+    /**
+     * loadConfiguration() with isAdmin=true adds a discriminated reason field
+     * when OpenRegister is missing — helps admins self-diagnose (issue #57).
+     *
+     * @return void
+     *
+     * @spec openspec/changes/example-change/tasks.md#task-3
+     */
+    public function testLoadConfigurationAdminReceivesReasonOnOrMissing(): void
+    {
+        $this->appManager->method('isInstalled')->with('openregister')->willReturn(false);
+        $this->logger->expects($this->once())->method('warning');
+
+        $result = $this->service->loadConfiguration(force: false, isAdmin: true);
+
+        self::assertFalse($result['success']);
+        self::assertSame('or_missing', $result['reason']);
+
+    }//end testLoadConfigurationAdminReceivesReasonOnOrMissing()
+
+    /**
+     * loadConfiguration() without isAdmin does NOT include a reason field —
+     * non-admin callers receive only the generic message (ADR-005, issue #57).
+     *
+     * @return void
+     *
+     * @spec openspec/changes/example-change/tasks.md#task-3
+     */
+    public function testLoadConfigurationNonAdminDoesNotReceiveReason(): void
+    {
+        $this->appManager->method('isInstalled')->with('openregister')->willReturn(false);
+        $this->logger->method('warning');
+
+        $result = $this->service->loadConfiguration(force: false, isAdmin: false);
+
+        self::assertFalse($result['success']);
+        self::assertArrayNotHasKey('reason', $result, 'Non-admin callers must not receive reason field');
+
+    }//end testLoadConfigurationNonAdminDoesNotReceiveReason()
 }//end class
