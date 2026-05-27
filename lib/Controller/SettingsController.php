@@ -146,7 +146,10 @@ class SettingsController extends Controller
     public function load(): JSONResponse
     {
         try {
-            $result = $this->settingsService->loadConfiguration(force: true);
+            // Pass isAdmin: true so loadConfiguration() includes a discriminated
+            // `reason` field in error responses to help admins self-diagnose failures
+            // (issue #57). Non-admin callers never reach this endpoint.
+            $result = $this->settingsService->loadConfiguration(force: true, isAdmin: true);
             return new JSONResponse($result);
         } catch (\Throwable $e) {
             $this->logger->error(

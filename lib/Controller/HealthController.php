@@ -30,6 +30,9 @@ use OCA\DeskDesk\AppInfo\Application;
 use OCA\DeskDesk\Service\SettingsService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\Attribute\AnonRateLimit;
+use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
+use OCP\AppFramework\Http\Attribute\PublicPage;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
@@ -65,13 +68,16 @@ class HealthController extends Controller
     /**
      * Health check JSON. Public endpoint.
      *
-     * @PublicPage
-     * @NoCSRFRequired
+     * Rate-limited to 60 anonymous requests/minute — sufficient for all
+     * reasonable monitoring cadences (ADR-006, issue #60).
      *
      * @return JSONResponse
      *
      * @spec openspec/changes/example-change/tasks.md#task-9
      */
+    #[PublicPage]
+    #[NoCSRFRequired]
+    #[AnonRateLimit(limit: 60, period: 60)]
     public function index(): JSONResponse
     {
         try {
