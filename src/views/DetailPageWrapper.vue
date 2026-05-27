@@ -69,14 +69,22 @@ export default {
 			 * @spec exclude academy tutorial demo — fetches the detail object when the route id changes, no spec-worthy behavior
 			 */
 			async handler() {
-				if (!this.id) return
-				this.loading = true
-				try {
-					this.object = await this.objectStore.fetchObject(this.schema, this.id)
-				} finally {
+			if (!this.id) return
+			// Capture the target ID to guard against races when the user
+			// navigates quickly between detail pages (issue #59).
+			const targetId = this.id
+			this.loading = true
+			try {
+				const obj = await this.objectStore.fetchObject(this.schema, targetId)
+				if (this.id === targetId) {
+					this.object = obj
+				}
+			} finally {
+				if (this.id === targetId) {
 					this.loading = false
 				}
-			},
+			}
+		},
 		},
 	},
 }

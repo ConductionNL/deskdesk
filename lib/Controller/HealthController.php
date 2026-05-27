@@ -28,6 +28,7 @@ namespace OCA\DeskDesk\Controller;
 
 use OCA\DeskDesk\AppInfo\Application;
 use OCA\DeskDesk\Service\SettingsService;
+use OCP\App\IAppManager;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\AnonRateLimit;
@@ -51,6 +52,7 @@ class HealthController extends Controller
      *
      * @param IRequest        $request         The request object
      * @param SettingsService $settingsService For OpenRegister availability check
+     * @param IAppManager     $appManager      For reading the app version dynamically
      * @param LoggerInterface $logger          The logger
      *
      * @return void
@@ -60,6 +62,7 @@ class HealthController extends Controller
     public function __construct(
         IRequest $request,
         private SettingsService $settingsService,
+        private IAppManager $appManager,
         private LoggerInterface $logger,
     ) {
         parent::__construct(appName: Application::APP_ID, request: $request);
@@ -93,7 +96,7 @@ class HealthController extends Controller
                 [
                     'status'       => $status,
                     'app'          => Application::APP_ID,
-                    'version'      => '0.1.0',
+                    'version'      => $this->appManager->getAppVersion(Application::APP_ID),
                     'dependencies' => [
                         'openregister' => $openRegister,
                     ],

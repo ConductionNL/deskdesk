@@ -37,6 +37,7 @@
 		:sort-key="sortKey"
 		:sort-order="sortOrder"
 		:include-columns="columns"
+		:filters="filters"
 		@refresh="refresh"
 		@sort="onSort"
 		@page-changed="onPageChange" />

@@ -96,9 +96,15 @@ export default {
 		 * @spec exclude academy tutorial demo — fetches zone-scoped knowledge_article objects for the tutorial sidebar tab, no spec-worthy behavior
 		 */
 		async load() {
+			// Capture the target ID at the start so a slower response for a
+			// previously-selected desk cannot overwrite the current selection
+			// (race-condition guard — issue #59).
+			const targetId = this.objectId
 			this.loading = true
 			try {
-				const desk = await this.objectStore.fetchObject(this.objectType, this.objectId)
+				const desk = await this.objectStore.fetchObject(this.objectType, targetId)
+				// Discard if the user navigated away while the fetch was in flight.
+				if (this.objectId !== targetId) return
 				const zone = desk?.zone
 				if (!zone) {
 					this.articles = []
@@ -109,9 +115,15 @@ export default {
 				// params straight to OpenRegister's filter syntax, so the
 				// zone filter lands as ?zone=east.
 				await this.objectStore.fetchCollection('knowledge_article', { zone, _limit: 25 })
+				// Guard again: a second navigation could have happened while
+				// the article fetch was in flight.
+				if (this.objectId !== targetId) return
 				this.articles = this.objectStore.collections.knowledge_article || []
 			} finally {
-				this.loading = false
+				// Only clear the loading flag if we still own the slot.
+				if (this.objectId === targetId) {
+					this.loading = false
+				}
 			}
 		},
 	},
