@@ -27,6 +27,7 @@ namespace OCA\DeskDesk\Controller;
 
 use OCA\DeskDesk\AppInfo\Application;
 use OCA\DeskDesk\Service\SettingsService;
+use OCP\App\IAppManager;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\AuthorizedAdminSetting;
@@ -56,6 +57,7 @@ class MetricsController extends Controller
      *
      * @param IRequest        $request         The request object
      * @param SettingsService $settingsService For OpenRegister availability check
+     * @param IAppManager     $appManager      For reading the app version dynamically
      * @param LoggerInterface $logger          The logger
      *
      * @return void
@@ -65,6 +67,7 @@ class MetricsController extends Controller
     public function __construct(
         IRequest $request,
         private SettingsService $settingsService,
+        private IAppManager $appManager,
         private LoggerInterface $logger,
     ) {
         parent::__construct(appName: Application::APP_ID, request: $request);
@@ -88,7 +91,7 @@ class MetricsController extends Controller
             $lines = [
                 '# HELP '.$prefix.'_info Static app information',
                 '# TYPE '.$prefix.'_info gauge',
-                $prefix.'_info{app="'.Application::APP_ID.'",version="0.1.0"} 1',
+                $prefix.'_info{app="'.Application::APP_ID.'",version="'.$this->appManager->getAppVersion(Application::APP_ID).'"} 1',
                 '# HELP '.$prefix.'_health_status 1 when OpenRegister reachable, 0 otherwise',
                 '# TYPE '.$prefix.'_health_status gauge',
                 $prefix.'_health_status '.$healthy,
