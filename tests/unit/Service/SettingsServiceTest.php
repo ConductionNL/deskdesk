@@ -322,7 +322,7 @@ class SettingsServiceTest extends TestCase
         $this->appManager->method('isInstalled')->willReturn(true);
         // getAppPath() is called to resolve the bundled register file path.
         // The path won't exist in the test FS so production falls back to
-        // the default version '0.2.0' (see SettingsService::loadConfiguration).
+        // the default version '0.4.0' (see SettingsService::loadConfiguration).
         $this->appManager->method('getAppPath')->willReturn('/tmp/deskdesk-test-app');
 
         $configurationService = new class {
@@ -352,7 +352,7 @@ class SettingsServiceTest extends TestCase
         $result = $this->service->loadConfiguration(force: true);
 
         self::assertTrue($result['success']);
-        self::assertSame('0.2.0', $result['version']);
+        self::assertSame('0.4.0', $result['version']);
 
     }//end testLoadConfigurationSuccessPathWithForce()
 

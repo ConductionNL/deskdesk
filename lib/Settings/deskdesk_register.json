@@ -3,7 +3,7 @@
   "info": {
     "title": "DeskDesk Register",
     "description": "Register containing all schemas for the DeskDesk application — floors, desks, bookings, and knowledge articles.",
-    "version": "0.3.0"
+    "version": "0.4.0"
   },
   "x-openregister": {
     "type": "application",
@@ -18,7 +18,7 @@
         "slug": "deskdesk",
         "title": "DeskDesk",
         "description": "Floors, desks, and bookings for the DeskDesk app.",
-        "version": "0.2.0",
+        "version": "0.3.0",
         "schemas": ["floor", "desk", "booking"]
       }
     },
@@ -26,7 +26,7 @@
       "floor": {
         "slug": "floor",
         "icon": "OfficeBuildingOutline",
-        "version": "0.1.0",
+        "version": "0.2.0",
         "title": "Floor",
         "description": "A physical floor in a building. Group desks together by location so users can browse and filter by where they sit.",
         "type": "object",
@@ -48,12 +48,17 @@
             "description": "URL to a static floor-plan image, rendered next to the floor in the detail view.",
             "example": "https://example.com/floor-plans/floor-3.svg"
           }
+        },
+        "authorization": {
+          "create": ["admin"],
+          "update": ["admin"],
+          "delete": ["admin"]
         }
       },
       "desk": {
         "slug": "desk",
         "icon": "DeskOutline",
-        "version": "0.1.0",
+        "version": "0.2.0",
         "title": "Desk",
         "description": "A bookable desk in an open-office. Desks belong to a floor and a zone, and carry equipment + accessibility metadata so users can pick the right one.",
         "type": "object",
@@ -112,12 +117,17 @@
             "description": "Free-form notes for the desk (quirks, etiquette, neighbours).",
             "example": "Window seat. Direct sun in the afternoon — bring a curtain clip if you need shade."
           }
+        },
+        "authorization": {
+          "create": ["admin"],
+          "update": ["admin"],
+          "delete": ["admin"]
         }
       },
       "booking": {
         "slug": "booking",
         "icon": "CalendarClock",
-        "version": "0.1.0",
+        "version": "0.2.0",
         "title": "Booking",
         "description": "A reservation of one desk by one user for a time slot. Status moves tentative -> confirmed -> cancelled. Recurrence is optional.",
         "type": "object",
@@ -166,12 +176,16 @@
             "description": "Optional RFC 5545 RRULE for recurring bookings. Keeps the schema simple; the recurrence engine can expand on read.",
             "example": "FREQ=WEEKLY;BYDAY=MO,WE,FR;COUNT=12"
           }
+        },
+        "authorization": {
+          "update": ["admin"],
+          "delete": ["admin"]
         }
       },
       "knowledge_article": {
         "slug": "knowledge_article",
         "icon": "BookOpenVariantOutline",
-        "version": "0.1.0",
+        "version": "0.2.0",
         "title": "Knowledge article",
         "description": "An external knowledge article surfaced in DeskDesk via OpenConnector. The canonical source lives in xWiki (or any wiki / docs system OpenConnector can target). DeskDesk treats these objects as read-only; sync is one-way wiki -> OpenRegister.",
         "type": "object",
@@ -204,6 +218,11 @@
             "description": "Wiki page id used by the OpenConnector synchronisation to dedupe across runs.",
             "example": "xwiki:DeskDeskKnowledge.East.Etiquette"
           }
+        },
+        "authorization": {
+          "create": ["admin"],
+          "update": ["admin"],
+          "delete": ["admin"]
         }
       }
     },

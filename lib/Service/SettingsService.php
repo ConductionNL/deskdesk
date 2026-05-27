@@ -241,13 +241,17 @@ class SettingsService
             // (path relative to /var/www/html).
             $appPath  = (string) $this->appManager->getAppPath(Application::APP_ID);
             $absolute = $appPath.'/lib/Settings/deskdesk_register.json';
-            $ncRoot   = \OC::$SERVERROOT;
+            $ncRoot   = '';
+            if (class_exists('OC') === true) {
+                $ncRoot = \OC::$SERVERROOT;
+            }
+
             $relative = ltrim($absolute, '/');
-            if (str_starts_with($absolute, $ncRoot.'/') === true) {
+            if ($ncRoot !== '' && str_starts_with($absolute, $ncRoot.'/') === true) {
                 $relative = substr($absolute, strlen($ncRoot) + 1);
             }
 
-            $version = '0.2.0';
+            $version = '0.4.0';
             if (file_exists($absolute) === true) {
                 $payload = json_decode((string) file_get_contents($absolute), true);
                 $version = (string) ($payload['info']['version'] ?? $version);
