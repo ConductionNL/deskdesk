@@ -188,7 +188,11 @@
             { "group": "public", "match": { "user": "$user.uid" } },
             "admin"
           ],
-          "update": ["admin"],
+          "update": [
+            { "match": { "@self.owner": "$user.uid" } },
+            { "match": { "user": "$user.uid" } },
+            "admin"
+          ],
           "delete": [
             { "match": { "@self.owner": "$user.uid" } },
             { "match": { "user": "$user.uid" } },
