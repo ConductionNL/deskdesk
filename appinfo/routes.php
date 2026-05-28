@@ -27,6 +27,8 @@ return [
 
         // Items API — demonstrates ADR-005 #[NoAdminRequired] + per-object auth
         // on a mutation (admin OR owner check lives in ItemService::delete()).
+        // H1: create forces booking.user = caller's UID for non-admins.
+        ['name' => 'item#create', 'url' => '/api/items', 'verb' => 'POST'],
         ['name' => 'item#destroy', 'url' => '/api/items/{id}', 'verb' => 'DELETE'],
 
         // Prometheus metrics endpoint (ADR-006) — admin auth.
