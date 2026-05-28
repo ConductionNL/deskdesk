@@ -358,8 +358,13 @@ class SettingsServiceTest extends TestCase
     }//end testLoadConfigurationReturnsFailureWhenOpenRegisterMissing()
 
     /**
-     * loadConfiguration() success path — delegates to OpenRegister's
-     * ConfigurationService::importFromApp(force: true) and returns its result.
+     * loadConfiguration() success path — writes a temporary fixture register file,
+     * delegates to OpenRegister's ConfigurationService::importFromFilePath(force:true),
+     * and returns a success result with the version parsed from the file.
+     *
+     * M1: the service now fails-closed when the register file is missing rather than
+     * falling back to a hardcoded version string. The test therefore creates a temp
+     * fixture file that is cleaned up after the assertion.
      *
      * @return void
      *
@@ -368,10 +373,13 @@ class SettingsServiceTest extends TestCase
     public function testLoadConfigurationSuccessPathWithForce(): void
     {
         $this->appManager->method('isInstalled')->willReturn(true);
-        // getAppPath() is called to resolve the bundled register file path.
-        // The path won't exist in the test FS so production falls back to
-        // the default version '0.4.0' (see SettingsService::loadConfiguration).
-        $this->appManager->method('getAppPath')->willReturn('/tmp/deskdesk-test-app');
+
+        // Create a minimal temp register fixture so the fail-closed file check passes.
+        $tmpDir  = sys_get_temp_dir().'/deskdesk-test-'.uniqid('', true);
+        mkdir($tmpDir.'/lib/Settings', 0755, true);
+        $fixture = $tmpDir.'/lib/Settings/deskdesk_register.json';
+        file_put_contents($fixture, json_encode(['info' => ['version' => '0.5.0']]));
+        $this->appManager->method('getAppPath')->willReturn($tmpDir);
 
         $configurationService = new class {
             /**
@@ -399,10 +407,41 @@ class SettingsServiceTest extends TestCase
 
         $result = $this->service->loadConfiguration(force: true);
 
+        // Clean up temp fixture.
+        unlink($fixture);
+        rmdir($tmpDir.'/lib/Settings');
+        rmdir($tmpDir.'/lib');
+        rmdir($tmpDir);
+
         self::assertTrue($result['success']);
-        self::assertSame('0.4.0', $result['version']);
+        self::assertSame('0.5.0', $result['version']);
 
     }//end testLoadConfigurationSuccessPathWithForce()
+
+    /**
+     * loadConfiguration() fails closed when the register file is missing (M1).
+     * Returns failure instead of silently importing with a hardcoded version.
+     *
+     * @return void
+     *
+     * @spec openspec/changes/example-change/tasks.md#task-8
+     */
+    public function testLoadConfigurationFailsClosedWhenRegisterFileMissing(): void
+    {
+        $this->appManager->method('isInstalled')->willReturn(true);
+        // Point to a directory that does not contain the register file.
+        $this->appManager->method('getAppPath')->willReturn('/tmp/deskdesk-nonexistent-'.uniqid('', true));
+
+        // Container MUST NOT be queried when the register file is absent.
+        $this->container->expects($this->never())->method('get');
+        $this->logger->expects($this->once())->method('error');
+
+        $result = $this->service->loadConfiguration();
+
+        self::assertFalse($result['success']);
+        self::assertSame('Configuration import failed.', $result['message']);
+
+    }//end testLoadConfigurationFailsClosedWhenRegisterFileMissing()
 
     /**
      * ADR-005 error path — when OpenRegister's ConfigurationService throws,

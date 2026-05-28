@@ -32,8 +32,8 @@
 		<article v-for="article in articles" :key="article.id" class="knowledge-tab__article">
 			<header class="knowledge-tab__head">
 				<h3>{{ article.name }}</h3>
-				<a v-if="article.url"
-					:href="article.url"
+				<a v-if="safeUrl(article.url)"
+					:href="safeUrl(article.url)"
 					target="_blank"
 					rel="noopener noreferrer">
 					{{ t('deskdesk', 'Open in wiki') }} ↗
@@ -92,6 +92,27 @@ export default {
 	},
 
 	methods: {
+		/**
+		 * Sanitize a URL to only allow http/https protocols (L1).
+		 * Prevents javascript: and data: URIs from being rendered as links.
+		 *
+		 * @spec exclude academy tutorial demo — URL protocol guard for knowledge article external links
+		 * @param {string|null|undefined} url Raw URL from OpenRegister
+		 * @return {string|null} Safe URL or null
+		 */
+		safeUrl(url) {
+			if (!url || typeof url !== 'string') return null
+			try {
+				const parsed = new URL(url)
+				if (parsed.protocol === 'https:' || parsed.protocol === 'http:') {
+					return url
+				}
+			} catch {
+				// unparseable URL — treat as unsafe
+			}
+			return null
+		},
+
 		/**
 		 * @spec exclude academy tutorial demo — fetches zone-scoped knowledge_article objects for the tutorial sidebar tab, no spec-worthy behavior
 		 */
