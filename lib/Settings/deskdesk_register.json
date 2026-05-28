@@ -3,7 +3,7 @@
   "info": {
     "title": "DeskDesk Register",
     "description": "Register containing all schemas for the DeskDesk application — floors, desks, bookings, and knowledge articles.",
-    "version": "0.4.0"
+    "version": "0.5.0"
   },
   "x-openregister": {
     "type": "application",
@@ -18,7 +18,7 @@
         "slug": "deskdesk",
         "title": "DeskDesk",
         "description": "Floors, desks, and bookings for the DeskDesk app.",
-        "version": "0.3.0",
+        "version": "0.5.0",
         "schemas": ["floor", "desk", "booking"]
       }
     },
@@ -127,7 +127,7 @@
       "booking": {
         "slug": "booking",
         "icon": "CalendarClock",
-        "version": "0.2.0",
+        "version": "0.3.0",
         "title": "Booking",
         "description": "A reservation of one desk by one user for a time slot. Status moves tentative -> confirmed -> cancelled. Recurrence is optional.",
         "type": "object",
@@ -178,6 +178,11 @@
           }
         },
         "authorization": {
+          "read": [
+            { "group": "public", "match": { "@self.owner": "$user.uid" } },
+            { "group": "public", "match": { "user": "$user.uid" } },
+            "admin"
+          ],
           "update": ["admin"],
           "delete": ["admin"]
         }

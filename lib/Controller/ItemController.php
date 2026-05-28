@@ -67,6 +67,48 @@ class ItemController extends Controller
     }//end __construct()
 
     /**
+     * Create a Booking object, enforcing the booking user field (H1).
+     *
+     * Non-admins always get `booking.user` set to their own UID regardless of
+     * what they pass in the body. Admins may create on behalf of another user.
+     *
+     * @return JSONResponse 201 with the created booking, 401 unauthenticated,
+     *                      503 when OpenRegister is missing.
+     *
+     * @spec openspec/changes/example-change/tasks.md#task-5
+     */
+    #[NoAdminRequired]
+    public function create(): JSONResponse
+    {
+        $user = $this->userSession->getUser();
+        if ($user === null) {
+            return new JSONResponse(['message' => 'Authentication required'], Http::STATUS_UNAUTHORIZED);
+        }
+
+        $body = $this->request->getParams();
+
+        try {
+            $result = $this->itemService->create(body: $body, userId: $user->getUID());
+        } catch (\Throwable $e) {
+            $this->logger->error(
+                'DeskDesk: failed to create item',
+                ['exception' => $e]
+            );
+            return new JSONResponse(['message' => 'Operation failed'], Http::STATUS_INTERNAL_SERVER_ERROR);
+        }
+
+        if ($result['status'] === ItemService::STATUS_CREATED) {
+            return new JSONResponse($result['object'], Http::STATUS_CREATED);
+        }
+
+        if ($result['status'] === ItemService::STATUS_UNAVAILABLE) {
+            return new JSONResponse(['message' => 'Service unavailable'], Http::STATUS_SERVICE_UNAVAILABLE);
+        }
+
+        return new JSONResponse(['message' => 'Operation failed'], Http::STATUS_INTERNAL_SERVER_ERROR);
+    }//end create()
+
+    /**
      * Delete a Booking object by UUID.
      *
      * `#[NoAdminRequired]` lets non-admins reach the endpoint; authorization

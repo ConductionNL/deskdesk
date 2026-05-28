@@ -146,15 +146,15 @@ class ItemServiceTest extends TestCase
             }
 
             /**
-             * Stub delete() mirroring OpenRegister ObjectService.
+             * Stub deleteObject() mirroring OpenRegister ObjectService (C1).
              *
+             * @param string $uuid     UUID of the object to delete.
              * @param string $register Register slug.
              * @param string $schema   Schema slug.
-             * @param string $id       Object ID.
              *
              * @return void
              */
-            public function delete(string $register, string $schema, string $id): void
+            public function deleteObject(string $uuid, string $register, string $schema): void
             {
                 $this->t->markObjectDeleted();
             }

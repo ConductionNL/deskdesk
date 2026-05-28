@@ -58,6 +58,8 @@ class ItemService
     /**
      * Result status enum used by delete() so the controller can map to HTTP codes.
      */
+    public const STATUS_CREATED = 'created';
+
     public const STATUS_DELETED = 'deleted';
 
     public const STATUS_NOT_FOUND = 'not_found';
@@ -95,6 +97,51 @@ class ItemService
         private readonly ContainerInterface $container,
     ) {
     }//end __construct()
+
+    /**
+     * Create a Booking object, enforcing the booking user field (H1).
+     *
+     * Non-admin callers MUST only create bookings for themselves.
+     * The `user` field in the body is always overridden with the caller's UID
+     * unless the caller is a Nextcloud group admin. This prevents user
+     * impersonation via the booking API.
+     *
+     * @param array<string,mixed> $body   Request body — `user` field will be
+     *                                    forced to $userId unless caller is admin.
+     * @param string              $userId UID of the acting user (always backend-derived,
+     *                                    NEVER taken from a request parameter)
+     *
+     * @return array{status: string, object: array<string,mixed>|null, message: string|null}
+     *
+     * @spec openspec/changes/example-change/tasks.md#task-5
+     */
+    public function create(array $body, string $userId): array
+    {
+        if ($this->appManager->isInstalled('openregister') === false) {
+            return ['status' => self::STATUS_UNAVAILABLE, 'object' => null, 'message' => 'Service unavailable'];
+        }
+
+        $objectService = $this->container->get('OCA\OpenRegister\Service\ObjectService');
+
+        $register = $this->appConfig->getValueString(Application::APP_ID, 'register', '');
+        if ($register === '') {
+            return ['status' => self::STATUS_NOT_FOUND, 'object' => null, 'message' => 'Register not configured'];
+        }
+
+        // H1: Force booking.user to the acting user for non-admins.
+        // Admins may create bookings on behalf of other users.
+        if ($this->groupManager->isAdmin($userId) === false) {
+            $body['user'] = $userId;
+        }
+
+        $object = $objectService->saveObject(
+            object: $body,
+            register: $register,
+            schema: self::SCHEMA_BOOKING,
+        );
+
+        return ['status' => self::STATUS_CREATED, 'object' => $object, 'message' => null];
+    }//end create()
 
     /**
      * Delete a Booking object, enforcing per-object authorization.
@@ -142,7 +189,7 @@ class ItemService
             return self::STATUS_FORBIDDEN;
         }
 
-        $objectService->delete(register: $register, schema: self::SCHEMA_BOOKING, id: $id);
+        $objectService->deleteObject(uuid: $id, register: $register, schema: self::SCHEMA_BOOKING);
 
         return self::STATUS_DELETED;
     }//end delete()
