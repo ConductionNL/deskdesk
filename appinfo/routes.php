@@ -40,6 +40,8 @@ return [
 
         // SPA catch-all — MUST remain last. Distinct route name from dashboard#page so
         // Symfony does not replace the GET `/` route (same names overwrite each other).
-        ['name' => 'dashboard#catchAll', 'url' => '/{path}', 'verb' => 'GET', 'requirements' => ['path' => '.+'], 'defaults' => ['path' => '']],
+        // M2: constraint excludes /api/* so a misconfigured or future unlisted API
+        // route does not silently fall through to the SPA and return HTML instead of JSON.
+        ['name' => 'dashboard#catchAll', 'url' => '/{path}', 'verb' => 'GET', 'requirements' => ['path' => '(?!api/).+'], 'defaults' => ['path' => '']],
     ],
 ];

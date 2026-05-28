@@ -268,25 +268,50 @@ class SettingsService
                 $relative = substr($absolute, strlen($ncRoot) + 1);
             }
 
-            $version = '0.4.0';
-            if (file_exists($absolute) === true) {
-                $raw     = file_get_contents($absolute);
-                $payload = ($raw !== false) ? json_decode($raw, true) : null;
-                if (json_last_error() !== JSON_ERROR_NONE) {
-                    $this->logger->error('DeskDesk: deskdesk_register.json is not valid JSON');
-                    $error = [
-                        'success' => false,
-                        'message' => 'Configuration import failed.',
-                    ];
-                    if ($isAdmin === true) {
-                        $error['reason'] = 'parse_error';
-                    }
-
-                    return $error;
+            // M1: fail-closed when the register file is unreadable — do NOT fall
+            // through with a hardcoded version string, which would import stale data.
+            if (file_exists($absolute) === false) {
+                $this->logger->error('DeskDesk: deskdesk_register.json not found at '.$absolute);
+                $error = [
+                    'success' => false,
+                    'message' => 'Configuration import failed.',
+                ];
+                if ($isAdmin === true) {
+                    $error['reason'] = 'file_missing';
                 }
 
-                $version = (string) ($payload['info']['version'] ?? $version);
+                return $error;
             }
+
+            $raw = file_get_contents($absolute);
+            if ($raw === false) {
+                $this->logger->error('DeskDesk: failed to read deskdesk_register.json at '.$absolute);
+                $error = [
+                    'success' => false,
+                    'message' => 'Configuration import failed.',
+                ];
+                if ($isAdmin === true) {
+                    $error['reason'] = 'file_unreadable';
+                }
+
+                return $error;
+            }
+
+            $payload = json_decode($raw, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                $this->logger->error('DeskDesk: deskdesk_register.json is not valid JSON');
+                $error = [
+                    'success' => false,
+                    'message' => 'Configuration import failed.',
+                ];
+                if ($isAdmin === true) {
+                    $error['reason'] = 'parse_error';
+                }
+
+                return $error;
+            }
+
+            $version = (string) ($payload['info']['version'] ?? '0.0.0');
 
             $configurationService = $this->container->get('OCA\OpenRegister\Service\ConfigurationService');
             $result = $configurationService->importFromFilePath(
