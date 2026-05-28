@@ -121,16 +121,23 @@ class SettingsService
 
         $resolved = $this->resolveRegisterIds();
 
-        return array_merge(
+        $response = array_merge(
             $settings,
             [
                 'openregisters' => $this->isOpenRegisterAvailable(),
                 'isAdmin'       => $isAdmin,
                 'registerId'    => $resolved['registerId'],
                 'registerSlug'  => self::REGISTER_SLUG,
-                'schemaIds'     => $resolved['schemaIds'],
             ]
         );
+
+        // schemaIds contains internal OR numeric IDs — expose only to admins to
+        // reduce enumeration surface for non-privileged users (issue #55).
+        if ($isAdmin === true) {
+            $response['schemaIds'] = $resolved['schemaIds'];
+        }
+
+        return $response;
     }//end getSettings()
 
     /**
@@ -158,8 +165,8 @@ class SettingsService
 
         try {
             $registerMapper = $this->container->get('OCA\OpenRegister\Db\RegisterMapper');
-            $register = $registerMapper->find(self::REGISTER_SLUG);
-            $registerId = (int) $register->getId();
+            $register       = $registerMapper->find(self::REGISTER_SLUG);
+            $registerId     = (int) $register->getId();
         } catch (\Throwable $e) {
             // Register isn't imported yet; that's expected on first boot
             // before the repair step has run. Log at debug level so the
@@ -219,36 +226,65 @@ class SettingsService
     /**
      * Load configuration from deskdesk_register.json via OpenRegister.
      *
-     * @param bool $force Force re-import even if already configured.
+     * @param bool $force   Force re-import even if already configured.
+     * @param bool $isAdmin Whether the caller is a Nextcloud admin. When true,
+     *                      a discriminated `reason` field is added to error responses
+     *                      so admins can self-diagnose import failures without
+     *                      exposing internal details to non-privileged callers.
      *
-     * @return array<string,mixed> Result with success flag, message, and version.
+     * @return array<string,mixed> Result with success flag, message, version, and
+     *                             optionally reason (admin-only on error).
      *
      * @spec openspec/changes/example-change/tasks.md#task-3
      */
-    public function loadConfiguration(bool $force=false): array
+    public function loadConfiguration(bool $force=false, bool $isAdmin=false): array
     {
         if ($this->isOpenRegisterAvailable() === false) {
             $this->logger->warning('DeskDesk: OpenRegister not available, skipping register initialization');
-            return [
+            $error = [
                 'success' => false,
                 'message' => 'OpenRegister is not installed or enabled.',
             ];
+            if ($isAdmin === true) {
+                $error['reason'] = 'or_missing';
+            }
+
+            return $error;
         }
 
         try {
             // Resolve the bundled register file relative to the Nextcloud root,
             // matching ConfigurationService::importFromFilePath's expectation
             // (path relative to /var/www/html).
-            $appPath = (string) $this->appManager->getAppPath(Application::APP_ID);
+            $appPath  = (string) $this->appManager->getAppPath(Application::APP_ID);
             $absolute = $appPath.'/lib/Settings/deskdesk_register.json';
-            $ncRoot = \OC::$SERVERROOT;
-            $relative = (str_starts_with($absolute, $ncRoot.'/') === true)
-                ? substr($absolute, strlen($ncRoot) + 1)
-                : ltrim($absolute, '/');
+            $ncRoot   = '';
+            if (class_exists('OC') === true) {
+                $ncRoot = \OC::$SERVERROOT;
+            }
 
-            $version = '0.2.0';
+            $relative = ltrim($absolute, '/');
+            if ($ncRoot !== '' && str_starts_with($absolute, $ncRoot.'/') === true) {
+                $relative = substr($absolute, strlen($ncRoot) + 1);
+            }
+
+            $version = '0.4.0';
             if (file_exists($absolute) === true) {
-                $payload = json_decode((string) file_get_contents($absolute), true);
+                $raw     = file_get_contents($absolute);
+                $payload = ($raw !== false) ? json_decode($raw, true) : null;
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    $this->logger->error('DeskDesk: deskdesk_register.json is not valid JSON');
+                    $error = [
+                        'success' => false,
+                        'message' => 'Configuration import failed.',
+                    ];
+                    if ($isAdmin === true) {
+                        $error['reason'] = 'parse_error';
+                    }
+
+                    return $error;
+                }
+
                 $version = (string) ($payload['info']['version'] ?? $version);
             }
 
@@ -279,10 +315,15 @@ class SettingsService
                 'DeskDesk: configuration import failed',
                 ['exception' => $e]
             );
-            return [
+            $error = [
                 'success' => false,
                 'message' => 'Configuration import failed.',
             ];
+            if ($isAdmin === true) {
+                $error['reason'] = 'or_error';
+            }
+
+            return $error;
         }//end try
     }//end loadConfiguration()
 }//end class

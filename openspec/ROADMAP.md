@@ -1,8 +1,8 @@
 # Roadmap
 
-This document tracks the planned development of Nextcloud App Template.
+This document tracks the planned development of DeskDesk.
 
-Features are defined in [`appspec/features/`](../appspec/features/). When a feature reaches `planned` status during an `/app-explore` session, it is listed here and an OpenSpec change is created with `/opsx:ff`.
+Features are defined in [`specs/`](specs/). When a feature reaches `planned` status during an `/app-explore` session, it is listed here and an OpenSpec change is created with `/opsx:ff`.
 
 ## Status Overview
 
@@ -14,11 +14,11 @@ Features are defined in [`appspec/features/`](../appspec/features/). When a feat
 
 ### Phase 1 — Foundation
 
-_Define the core features needed for a working app. These are the minimum set that make the app useful._
+_Desk catalogue (floors, zones, desks), basic booking, and a dashboard. The minimum set that makes the app useful._
 
 ### Phase 2 — Enhancement
 
-_Add features that improve the experience, extend functionality, and cover more use cases._
+_Recurring bookings, calendar sync via the OpenRegister calendar provider, and the contextual per-desk knowledge panel (OpenConnector + xWiki)._
 
 ### Phase 3 — Polish
 
@@ -28,7 +28,7 @@ _Performance, accessibility improvements, full localization, and hardening for p
 
 ## How This Works
 
-1. Run `/app-explore` to define features in `appspec/features/`
+1. Run `/app-explore` to define features in `specs/`
 2. When a feature is `planned`, add it to the table above
 3. Run `/opsx:ff {feature-name}` to create the implementation spec
 4. Update the **OpenSpec Change** column with a link to the change directory

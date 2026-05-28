@@ -32,11 +32,16 @@
 		<article v-for="article in articles" :key="article.id" class="knowledge-tab__article">
 			<header class="knowledge-tab__head">
 				<h3>{{ article.name }}</h3>
-				<a v-if="article.url" :href="article.url" target="_blank" rel="noopener noreferrer">
+				<a v-if="article.url"
+					:href="article.url"
+					target="_blank"
+					rel="noopener noreferrer">
 					{{ t('deskdesk', 'Open in wiki') }} ↗
 				</a>
 			</header>
-			<p class="knowledge-tab__body">{{ article.body }}</p>
+			<p class="knowledge-tab__body">
+				{{ article.body }}
+			</p>
 		</article>
 	</div>
 </template>
@@ -54,6 +59,9 @@ export default {
 		objectType: { type: String, default: 'desk' },
 	},
 
+	/**
+	 * @spec exclude academy tutorial demo — exposes the shared object store to the knowledge tab, no spec-worthy behavior
+	 */
 	setup() {
 		return { objectStore: useObjectStore() }
 	},
@@ -63,6 +71,9 @@ export default {
 	},
 
 	computed: {
+		/**
+		 * @spec exclude academy tutorial demo — static empty-state copy for the tutorial knowledge tab, no spec-worthy behavior
+		 */
 		emptyDescription() {
 			return this.t('deskdesk', 'Write one in your wiki, tag it with the desk zone, and it will appear here on the next sync.')
 		},
@@ -71,6 +82,9 @@ export default {
 	watch: {
 		objectId: {
 			immediate: true,
+			/**
+			 * @spec exclude academy tutorial demo — reloads articles when the watched desk id changes, no spec-worthy behavior
+			 */
 			async handler() {
 				await this.load()
 			},
@@ -78,10 +92,19 @@ export default {
 	},
 
 	methods: {
+		/**
+		 * @spec exclude academy tutorial demo — fetches zone-scoped knowledge_article objects for the tutorial sidebar tab, no spec-worthy behavior
+		 */
 		async load() {
+			// Capture the target ID at the start so a slower response for a
+			// previously-selected desk cannot overwrite the current selection
+			// (race-condition guard — issue #59).
+			const targetId = this.objectId
 			this.loading = true
 			try {
-				const desk = await this.objectStore.fetchObject(this.objectType, this.objectId)
+				const desk = await this.objectStore.fetchObject(this.objectType, targetId)
+				// Discard if the user navigated away while the fetch was in flight.
+				if (this.objectId !== targetId) return
 				const zone = desk?.zone
 				if (!zone) {
 					this.articles = []
@@ -92,9 +115,15 @@ export default {
 				// params straight to OpenRegister's filter syntax, so the
 				// zone filter lands as ?zone=east.
 				await this.objectStore.fetchCollection('knowledge_article', { zone, _limit: 25 })
+				// Guard again: a second navigation could have happened while
+				// the article fetch was in flight.
+				if (this.objectId !== targetId) return
 				this.articles = this.objectStore.collections.knowledge_article || []
 			} finally {
-				this.loading = false
+				// Only clear the loading flag if we still own the slot.
+				if (this.objectId === targetId) {
+					this.loading = false
+				}
 			}
 		},
 	},

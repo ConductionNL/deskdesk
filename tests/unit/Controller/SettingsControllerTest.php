@@ -4,7 +4,7 @@
  * Unit tests for SettingsController.
  *
  * @category Test
- * @package  OCA\AppTemplate\Tests\Unit\Controller
+ * @package  OCA\DeskDesk\Tests\Unit\Controller
  *
  * @author    Conduction Development Team <info@conduction.nl>
  * @copyright 2026 Conduction B.V.
@@ -17,10 +17,10 @@
 
 declare(strict_types=1);
 
-namespace OCA\AppTemplate\Tests\Unit\Controller;
+namespace OCA\DeskDesk\Tests\Unit\Controller;
 
-use OCA\AppTemplate\Controller\SettingsController;
-use OCA\AppTemplate\Service\SettingsService;
+use OCA\DeskDesk\Controller\SettingsController;
+use OCA\DeskDesk\Service\SettingsService;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\IRequest;
 use PHPUnit\Framework\MockObject\MockObject;

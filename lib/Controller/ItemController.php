@@ -3,7 +3,7 @@
 /**
  * DeskDesk Item Controller
  *
- * Controller for Article (item) mutation endpoints. Demonstrates the ADR-005
+ * Controller for Booking mutation endpoints. Demonstrates the ADR-005
  * `#[NoAdminRequired]` + per-object auth pattern on DELETE /api/items/{id}.
  *
  * @category Controller
@@ -36,7 +36,7 @@ use OCP\IUserSession;
 use Psr\Log\LoggerInterface;
 
 /**
- * Controller for Article (item) mutations.
+ * Controller for Booking mutations.
  *
  * Demonstrates ADR-003 (Controller → Service layering: the controller only
  * maps service results to HTTP codes) and ADR-005 (per-object authorization
@@ -67,7 +67,7 @@ class ItemController extends Controller
     }//end __construct()
 
     /**
-     * Delete an Article object by UUID.
+     * Delete a Booking object by UUID.
      *
      * `#[NoAdminRequired]` lets non-admins reach the endpoint; authorization
      * is enforced inside `ItemService::delete()` via an admin-or-owner check

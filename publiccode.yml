@@ -1,0 +1,64 @@
+publiccodeYmlVersion: "0.4"
+
+name: DeskDesk
+url: "https://github.com/ConductionNL/deskdesk"
+softwareVersion: "0.1.1"
+releaseDate: "2026-05-26"
+developmentStatus: beta
+softwareType: "standalone/other"
+
+platforms:
+  - nextcloud
+
+categories:
+  - helpdesk
+  - it-service-management
+
+description:
+  en:
+    shortDescription: >
+      Help desk and service request management for Nextcloud.
+    longDescription: >
+      DeskDesk is a help desk and service request management application for Nextcloud.
+      It enables organisations to manage support tickets, service requests, and customer
+      service workflows. Built on Open Register, it integrates with Nextcloud's
+      collaboration ecosystem and provides a structured approach to handling internal
+      and external service requests.
+    features:
+      - Support ticket management
+      - Service request workflows
+      - Customer service administration
+      - Integration with Nextcloud collaboration tools
+
+  nl:
+    shortDescription: >
+      Helpdesk en serviceverzoekbeheer voor Nextcloud.
+    longDescription: >
+      DeskDesk is een helpdesk- en serviceverzoekbeheertoepassing voor Nextcloud.
+      Het stelt organisaties in staat om supporttickets, serviceverzoeken en
+      klantenservice-workflows te beheren. Gebouwd op Open Register integreert het
+      met het Nextcloud-samenwerkingsecosysteem en biedt een gestructureerde aanpak
+      voor het afhandelen van interne en externe serviceverzoeken.
+    features:
+      - Supportticketbeheer
+      - Serviceverzoek-workflows
+      - Klantenserviceadministratie
+      - Integratie met Nextcloud-samenwerkingstools
+
+legal:
+  license: EUPL-1.2
+  mainCopyrightOwner: "Conduction B.V."
+  repoOwner: "Conduction B.V."
+
+maintenance:
+  type: community
+  contacts:
+    - name: Conduction B.V.
+      email: info@conduction.nl
+      affiliation: Conduction B.V.
+
+localisation:
+  localisationReady: true
+  availableLanguages:
+    - nl
+    - en

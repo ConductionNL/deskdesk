@@ -8,7 +8,7 @@
  * security-critical branches.
  *
  * @category Test
- * @package  OCA\AppTemplate\Tests\Unit\Service
+ * @package  OCA\DeskDesk\Tests\Unit\Service
  *
  * @author    Conduction Development Team <info@conduction.nl>
  * @copyright 2026 Conduction B.V.
@@ -23,9 +23,9 @@
 
 declare(strict_types=1);
 
-namespace OCA\AppTemplate\Tests\Unit\Service;
+namespace OCA\DeskDesk\Tests\Unit\Service;
 
-use OCA\AppTemplate\Service\ItemService;
+use OCA\DeskDesk\Service\ItemService;
 use OCP\App\IAppManager;
 use OCP\IAppConfig;
 use OCP\IGroupManager;
@@ -209,7 +209,7 @@ class ItemServiceTest extends TestCase
     private function arrangeOpenRegister(): void
     {
         $this->appManager->method('isInstalled')->willReturn(true);
-        $this->appConfig->method('getValueString')->willReturn('app-template');
+        $this->appConfig->method('getValueString')->willReturn('deskdesk');
         $this->container->method('get')->willReturn($this->objectService);
     }//end arrangeOpenRegister()
 
@@ -278,7 +278,7 @@ class ItemServiceTest extends TestCase
 
     /**
      * delete() returns STATUS_FORBIDDEN when the caller is neither admin nor
-     * owner — and MUST NOT actually delete the object.
+     * creator (@self.owner) nor booking.user — and MUST NOT actually delete.
      *
      * @return void
      *
@@ -287,7 +287,7 @@ class ItemServiceTest extends TestCase
     public function testDeleteReturnsForbiddenForNonAdminNonOwner(): void
     {
         $this->arrangeOpenRegister();
-        $this->objectPayload = ['@self' => ['owner' => 'alice']];
+        $this->objectPayload = ['@self' => ['owner' => 'alice'], 'user' => 'carol'];
 
         $this->groupManager->expects($this->once())
             ->method('isAdmin')
@@ -302,7 +302,7 @@ class ItemServiceTest extends TestCase
     }//end testDeleteReturnsForbiddenForNonAdminNonOwner()
 
     /**
-     * delete() allows the owner to delete their own object.
+     * delete() allows the creator (@self.owner) to delete their own booking.
      *
      * @return void
      *
@@ -311,7 +311,7 @@ class ItemServiceTest extends TestCase
     public function testDeleteAllowsOwner(): void
     {
         $this->arrangeOpenRegister();
-        $this->objectPayload = ['@self' => ['owner' => 'alice']];
+        $this->objectPayload = ['@self' => ['owner' => 'alice'], 'user' => 'carol'];
 
         $this->groupManager->expects($this->once())
             ->method('isAdmin')
@@ -326,6 +326,34 @@ class ItemServiceTest extends TestCase
     }//end testDeleteAllowsOwner()
 
     /**
+     * delete() allows the booking subject (booking.user) to cancel their
+     * own reservation, even when they are not the creator (@self.owner).
+     *
+     * This covers the office-manager-creates-for-user scenario.
+     *
+     * @return void
+     *
+     * @spec openspec/changes/example-change/tasks.md#task-5
+     */
+    public function testDeleteAllowsBookingUser(): void
+    {
+        $this->arrangeOpenRegister();
+        // alice is the creator (office manager), carol is the booking subject.
+        $this->objectPayload = ['@self' => ['owner' => 'alice'], 'user' => 'carol'];
+
+        $this->groupManager->expects($this->once())
+            ->method('isAdmin')
+            ->with('carol')
+            ->willReturn(false);
+
+        $result = $this->service->delete(id: 'x', userId: 'carol');
+
+        self::assertSame(ItemService::STATUS_DELETED, $result);
+        self::assertTrue($this->objectDeleted, 'Booking subject must be able to cancel their own booking');
+
+    }//end testDeleteAllowsBookingUser()
+
+    /**
      * delete() allows an admin to delete another user's object — the admin
      * branch short-circuits the ownership check.
      *
@@ -336,7 +364,7 @@ class ItemServiceTest extends TestCase
     public function testDeleteAllowsAdmin(): void
     {
         $this->arrangeOpenRegister();
-        $this->objectPayload = ['@self' => ['owner' => 'someone-else']];
+        $this->objectPayload = ['@self' => ['owner' => 'someone-else'], 'user' => 'another'];
 
         $this->groupManager->expects($this->once())
             ->method('isAdmin')
@@ -349,4 +377,31 @@ class ItemServiceTest extends TestCase
         self::assertTrue($this->objectDeleted);
 
     }//end testDeleteAllowsAdmin()
+
+    /**
+     * extractOwner() array path: non-string @self.owner returns null (fail-secure),
+     * mirroring the object path's is_string() guard.
+     *
+     * @return void
+     *
+     * @spec openspec/changes/example-change/tasks.md#task-5
+     */
+    public function testDeleteReturnsForbiddenWhenOwnerIsNonStringArrayRef(): void
+    {
+        $this->arrangeOpenRegister();
+        // Simulate OR returning an entity-ref array for @self.owner instead of a UID string.
+        $this->objectPayload = ['@self' => ['owner' => ['id' => 42, 'type' => 'user']], 'user' => null];
+
+        $this->groupManager->expects($this->once())
+            ->method('isAdmin')
+            ->with('alice')
+            ->willReturn(false);
+
+        $result = $this->service->delete(id: 'x', userId: 'alice');
+
+        // non-string owner + null booking.user -> forbidden (fail-secure)
+        self::assertSame(ItemService::STATUS_FORBIDDEN, $result);
+        self::assertFalse($this->objectDeleted);
+
+    }//end testDeleteReturnsForbiddenWhenOwnerIsNonStringArrayRef()
 }//end class

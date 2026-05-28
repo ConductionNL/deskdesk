@@ -6,4 +6,4 @@ use OCP\Util;
 $appId = OCA\DeskDesk\AppInfo\Application::APP_ID;
 Util::addScript($appId, $appId . '-settings');
 ?>
-<div id="deskdesk-settings" data-version="<?php p($_['version'] ?? ''); ?>"></div>
+<div id="deskdesk-settings"></div>

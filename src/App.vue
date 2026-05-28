@@ -51,10 +51,14 @@ export default {
 	name: 'App',
 	components: { CnAppRoot, CnObjectSidebar },
 
-	// CnDetailPage injects `objectSidebarState` and pushes the current
-	// page's sidebar config (objectId, objectType, tabs, ...) into it.
-	// We mount CnObjectSidebar reactively against the same state via
-	// the CnAppRoot `#sidebar` slot.
+	/**
+	 * CnDetailPage injects `objectSidebarState` and pushes the current
+	 * page's sidebar config (objectId, objectType, tabs, ...) into it.
+	 * We mount CnObjectSidebar reactively against the same state via
+	 * the CnAppRoot `#sidebar` slot.
+	 *
+	 * @spec exclude academy tutorial demo — Vue provide() glue wiring shared sidebar state, no spec-worthy behavior
+	 */
 	provide() {
 		return {
 			objectSidebarState: this.objectSidebarState,

@@ -1,39 +1,47 @@
 <p align="center">
-  <img src="img/app-store.svg" alt="Nextcloud App Template logo" width="80" height="80">
+  <img src="img/app-store.svg" alt="DeskDesk logo" width="80" height="80">
 </p>
 
-<h1 align="center">Nextcloud App Template</h1>
+<h1 align="center">DeskDesk</h1>
 
 <p align="center">
-  <strong>A template for creating new Nextcloud apps</strong>
+  <strong>Flexible desk booking for open-office environments</strong>
 </p>
 
 <p align="center">
-  <a href="https://github.com/ConductionNL/nextcloud-app-template/releases"><img src="https://img.shields.io/github/v/release/ConductionNL/nextcloud-app-template" alt="Latest release"></a>
-  <a href="https://github.com/ConductionNL/nextcloud-app-template/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-EUPL--1.2-blue" alt="License"></a>
-  <a href="https://github.com/ConductionNL/nextcloud-app-template/actions"><img src="https://img.shields.io/github/actions/workflow/status/ConductionNL/nextcloud-app-template/code-quality.yml?label=quality" alt="Code quality"></a>
+  <a href="https://github.com/ConductionNL/deskdesk/releases"><img src="https://img.shields.io/github/v/release/ConductionNL/deskdesk" alt="Latest release"></a>
+  <a href="https://github.com/ConductionNL/deskdesk/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-EUPL--1.2-blue" alt="License"></a>
+  <a href="https://github.com/ConductionNL/deskdesk/actions"><img src="https://img.shields.io/github/actions/workflow/status/ConductionNL/deskdesk/code-quality.yml?label=quality" alt="Code quality"></a>
 </p>
 
 ---
 
-A starting point for building Nextcloud apps following ConductionNL conventions.
+Pick a desk on a floor, book a slot, sync it to your calendar, and read the booking how-tos from the company wiki — without leaving Nextcloud.
 
-> **Pre-wired for [OpenRegister](https://github.com/ConductionNL/openregister)** — all data is stored as OpenRegister objects. If your app needs OpenRegister, install it first. If not, remove the dependency from `appinfo/info.xml` and `openspec/app-config.json`.
+DeskDesk is also the **reference app for the Conduction Nextcloud stack**: it demonstrates schema-driven objects, the manifest pattern, stacked detail/index views, and schema-driven integrations with Nextcloud Calendar and xWiki. Built with [@conduction/nextcloud-vue](https://github.com/ConductionNL/nextcloud-vue) on top of [OpenRegister](https://github.com/ConductionNL/openregister).
+
+> **Pre-wired for [OpenRegister](https://github.com/ConductionNL/openregister)** — all data (desks, bookings, zones) is stored as OpenRegister objects. OpenRegister must be installed first. The Calendar sync and the per-desk knowledge panel also need [OpenConnector](https://github.com/ConductionNL/openconnector) and a Nextcloud Calendar app.
 
 ## Screenshots
 
-_Add screenshots here once the app has a UI._
+_Add screenshots here once the UI stabilises._
 
 ## Features
 
 Features are defined in [`openspec/specs/`](openspec/specs/). See the [roadmap](openspec/ROADMAP.md) for planned work.
 
 ### Core
-- **Dashboard** — Personal overview page with key information at a glance
+- **Desk catalogue** — Browse desks by floor, zone, equipment, and accessibility
+- **Booking** — Reserve a slot, with optional recurrence
+- **Dashboard** — Occupancy at a glance, your upcoming bookings, and popular zones
 - **Admin Settings** — Configurable settings panel for administrators
 
+### Integrations
+- **Calendar sync** — Bookings appear in Nextcloud Calendar via the OpenRegister calendar provider
+- **Contextual knowledge** — "How does this work?" articles surface per desk via OpenConnector + xWiki
+- **OpenRegister data layer** — Desks, bookings, zones, and floors as OpenRegister objects
+
 ### Supporting
-- **OpenRegister Integration** — Pre-wired data layer using OpenRegister objects
 - **Quality Pipeline** — PHPCS, PHPMD, Psalm, PHPStan, ESLint, Stylelint
 
 ## Architecture
@@ -42,8 +50,10 @@ Features are defined in [`openspec/specs/`](openspec/specs/). See the [roadmap](
 graph TD
     A[Vue 2 Frontend] -->|REST API| B[OpenRegister API]
     B --> C[(PostgreSQL JSON store)]
-    A --> D[Nextcloud Activity]
-    A --> E[Nextcloud Search]
+    B -->|calendar provider| D[Nextcloud Calendar]
+    A -->|knowledge panel| E[OpenConnector] --> F[xWiki]
+    A --> G[Nextcloud Activity]
+    A --> H[Nextcloud Search]
 ```
 
 _Update this diagram during `/app-explore` sessions as the architecture evolves._
@@ -52,42 +62,47 @@ _Update this diagram during `/app-explore` sessions as the architecture evolves.
 
 | Object | Description |
 |--------|-------------|
-| _(define your data objects here)_ | — |
+| Desk | A bookable desk — floor, zone, equipment, accessibility attributes |
+| Booking | A reservation of a desk for a person and a time slot (optionally recurring) |
+| Zone | A grouping of desks within a floor (e.g. "quiet", "team space") |
+| Floor | A floor / building level that contains zones and desks |
 
-_Data model is defined using OpenRegister schemas. See [`openspec/specs/`](openspec/specs/) for feature-level design decisions and [`openspec/architecture/`](openspec/architecture/) for architectural decisions._
+_The data model is defined as OpenRegister schemas — see [`openspec/schemas/`](openspec/schemas/). Feature-level design lives in [`openspec/specs/`](openspec/specs/); architectural decisions in [`openspec/architecture/`](openspec/architecture/)._
 
 ### Directory Structure
 
 ```
-app-template/
-├── appinfo/                    # Nextcloud app manifest, routes, navigation
-├── lib/                        # PHP backend
+deskdesk/
+├── appinfo/                       # Nextcloud app manifest, routes, navigation
+├── lib/                           # PHP backend
 │   ├── AppInfo/Application.php
-│   ├── Controller/             # DashboardController, SettingsController
-│   ├── Service/SettingsService.php
+│   ├── Controller/                # Dashboard, Health, Item, Metrics, Settings
+│   ├── Service/                   # ItemService, SettingsService
 │   ├── Listener/DeepLinkRegistrationListener.php
 │   ├── Repair/InitializeSettings.php
-│   └── Settings/               # AdminSettings, app_template_register.json
-├── templates/                  # PHP templates (SPA shells)
-├── src/                        # Vue 2 frontend
-│   ├── main.js                 # App entry point
-│   ├── App.vue                 # Root component
-│   ├── navigation/MainMenu.vue # App navigation sidebar
-│   ├── router/                 # Vue Router
-│   ├── store/                  # Pinia stores
-│   └── views/                  # Route-level views + UserSettings.vue
-├── openspec/                   # Specifications, decisions, and roadmap
-│   ├── app-config.json         # Canonical app config (id, goal, dependencies, CI)
-│   ├── config.yaml             # OpenSpec CLI configuration
-│   ├── specs/                  # Feature specs (input for OpenSpec changes)
-│   ├── architecture/           # App-specific Architectural Decision Records
-│   ├── ROADMAP.md              # Product roadmap
-│   └── changes/                # OpenSpec change directories (created on first change)
-├── tests/                      # Unit and integration tests
-├── l10n/                       # Translations (en, nl)
-├── .github/workflows/          # CI/CD pipelines
-├── Makefile                    # Dev helpers (make dev-link)
-└── img/                        # App icons and screenshots
+│   ├── Sections/SettingsSection.php
+│   └── Settings/AdminSettings.php
+├── templates/                     # PHP templates (SPA shells)
+├── src/                           # Vue 2 frontend
+│   ├── main.js                    # App entry point
+│   ├── App.vue                    # Root component
+│   ├── router/index.js            # Vue Router
+│   ├── store/                     # Pinia stores (object, settings)
+│   └── views/                     # IndexPageWrapper, DetailPageWrapper, KnowledgeTab, settings/
+├── openspec/                      # Specifications, schemas, decisions, and roadmap
+│   ├── app-config.json            # Canonical app config (id, goal, dependencies, CI)
+│   ├── config.yaml                # OpenSpec CLI configuration
+│   ├── schemas/                   # OpenRegister schemas
+│   ├── specs/                     # Feature specs (input for OpenSpec changes)
+│   ├── architecture/              # App-specific Architectural Decision Records
+│   ├── ROADMAP.md                 # Product roadmap
+│   └── changes/                   # OpenSpec change directories (created on first change)
+├── docs/                          # Feature and standards documentation
+├── tests/                         # Unit and integration tests
+├── l10n/                          # Translations (en, nl)
+├── .github/workflows/             # CI/CD pipelines
+├── Makefile                       # Dev helpers (make dev-link)
+└── img/                           # App icons and screenshots
 ```
 
 ## Requirements
@@ -98,13 +113,15 @@ app-template/
 | PHP | 8.1+ |
 | Node.js | 20+ |
 | [OpenRegister](https://github.com/ConductionNL/openregister) | latest |
+| [OpenConnector](https://github.com/ConductionNL/openconnector) | latest (for the per-desk knowledge panel) |
+| Nextcloud Calendar | optional (for booking → calendar sync) |
 
 ## Installation
 
 ### From the Nextcloud App Store
 
 1. Go to **Apps** in your Nextcloud instance
-2. Search for **Nextcloud App Template**
+2. Search for **DeskDesk**
 3. Click **Download and enable**
 
 > OpenRegister must be installed first. [Install OpenRegister →](https://apps.nextcloud.com/apps/openregister)
@@ -113,10 +130,10 @@ app-template/
 
 ```bash
 cd /var/www/html/custom_apps
-git clone https://github.com/ConductionNL/nextcloud-app-template.git app-template
-cd app-template
+git clone https://github.com/ConductionNL/deskdesk.git deskdesk
+cd deskdesk
 npm install && npm run build
-php occ app:enable app-template
+php occ app:enable deskdesk
 ```
 
 ## Development
@@ -151,15 +168,14 @@ npm run stylelint       # CSS linting
 
 ### Enable locally
 
-Nextcloud requires the app directory name to match the `<id>` in `appinfo/info.xml` (`app-template`).
-When this repo is cloned as `nextcloud-app-template`, create a relative symlink first.
+Nextcloud requires the app directory name to match the `<id>` in `appinfo/info.xml` (`deskdesk`).
 
 > **Note:** The `js/` build output is not committed. You must build the frontend before enabling the app, or the UI will be blank.
 
 ```bash
 make dev-link
 npm install && npm run build
-docker exec nextcloud php occ app:enable app-template
+docker exec nextcloud php occ app:enable deskdesk
 ```
 
 ## Tech Stack
@@ -171,6 +187,7 @@ docker exec nextcloud php occ app:enable app-template
 | Backend | PHP 8.1+, Nextcloud App Framework |
 | Data | OpenRegister (PostgreSQL JSON objects) |
 | UX | @conduction/nextcloud-vue |
+| Integrations | Nextcloud Calendar (OpenRegister calendar provider), xWiki (via OpenConnector) |
 | Quality | PHPCS, PHPMD, Psalm, PHPStan, ESLint, Stylelint |
 
 ## Branches
@@ -185,7 +202,9 @@ docker exec nextcloud php occ app:enable app-template
 
 | Resource | Description |
 |----------|-------------|
+| [`docs/`](docs/) | Feature and standards documentation |
 | [`openspec/app-config.json`](openspec/app-config.json) | App identity, goals, dependencies, and CI configuration |
+| [`openspec/schemas/`](openspec/schemas/) | OpenRegister schemas — the data model |
 | [`openspec/specs/`](openspec/specs/) | Feature specs — what the app should do |
 | [`openspec/architecture/`](openspec/architecture/) | App-specific Architectural Decision Records |
 | [`openspec/ROADMAP.md`](openspec/ROADMAP.md) | Product roadmap |
@@ -201,8 +220,8 @@ docker exec nextcloud php occ app:enable app-template
 ## Related Apps
 
 - **[OpenRegister](https://github.com/ConductionNL/openregister)** — Object storage layer (required dependency)
-
-_Add related apps here as integrations are built._
+- **[OpenConnector](https://github.com/ConductionNL/openconnector)** — Powers the contextual per-desk knowledge panel (xWiki integration)
+- **Nextcloud Calendar** — Bookings sync here via the OpenRegister calendar provider
 
 ## Troubleshooting
 
@@ -214,19 +233,27 @@ The `js/` build output is not committed to the repo. Run the frontend build befo
 npm install && npm run build
 ```
 
-### "Could not download app app-template" when running `occ app:enable`
+### "Could not download app deskdesk" when running `occ app:enable`
 
-Nextcloud requires the app directory name to exactly match the `<id>` in `appinfo/info.xml`. When this repo is cloned as `nextcloud-app-template`, create a symlink first:
+Nextcloud requires the app directory name to exactly match the `<id>` in `appinfo/info.xml` (`deskdesk`). If you cloned the repo under a different name, create a symlink first:
 
 ```bash
-make dev-link   # creates apps-extra/app-template -> nextcloud-app-template
+make dev-link   # creates apps-extra/deskdesk -> <clone dir>
 ```
 
 Then enable the app again:
 
 ```bash
-docker exec nextcloud php occ app:enable app-template
+docker exec nextcloud php occ app:enable deskdesk
 ```
+
+### Bookings don't appear in Calendar
+
+The calendar sync runs through the OpenRegister calendar provider — make sure OpenRegister is installed and enabled, and that a Nextcloud Calendar app is present.
+
+### The per-desk knowledge panel is empty
+
+Knowledge articles are pulled via OpenConnector from xWiki. Check that OpenConnector is installed and that the xWiki source is configured.
 
 ## Support
 
