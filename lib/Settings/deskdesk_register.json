@@ -19,7 +19,7 @@
         "title": "DeskDesk",
         "description": "Floors, desks, and bookings for the DeskDesk app.",
         "version": "0.5.0",
-        "schemas": ["floor", "desk", "booking"]
+        "schemas": ["floor", "desk", "booking", "knowledge_article"]
       }
     },
     "schemas": {
@@ -178,13 +178,22 @@
           }
         },
         "authorization": {
+          "create": [
+            { "match": { "@self.owner": "$user.uid" } },
+            { "match": { "user": "$user.uid" } },
+            "admin"
+          ],
           "read": [
             { "group": "public", "match": { "@self.owner": "$user.uid" } },
             { "group": "public", "match": { "user": "$user.uid" } },
             "admin"
           ],
           "update": ["admin"],
-          "delete": ["admin"]
+          "delete": [
+            { "match": { "@self.owner": "$user.uid" } },
+            { "match": { "user": "$user.uid" } },
+            "admin"
+          ]
         }
       },
       "knowledge_article": {
