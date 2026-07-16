@@ -34,7 +34,7 @@
     "pinia": "^2.1.7",
     "sass": "^1.77.0",
     "sass-loader": "^16.0.0",
-    "vue": "^2.7.14",
+    "vue": "^3.5.40",
     "vue-apexcharts": "^1.7.0",
     "vue-material-design-icons": "^5.3.0",
     "vue-router": "^3.6.5"
@@ -43,7 +43,7 @@
     "libxmljs2": "^0.37.0"
   },
   "devDependencies": {
-    "@cyclonedx/cyclonedx-npm": "^4.2.1",
+    "@cyclonedx/cyclonedx-npm": "^5.0.0",
     "@eslint/config-helpers": "^0.4.2",
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.39.1",
@@ -60,7 +60,7 @@
     "style-loader": "~4.0.0",
     "stylelint": "^15.11.0",
     "vue-eslint-parser": "^9.4.3",
-    "vue-loader": "^15.11.1 <16.0.0",
+    "vue-loader": "^15.11.1 <18.0.0",
     "vue-template-compiler": "^2.7.16",
     "webpack": "^5.94.0",
     "webpack-cli": "^6.0.1"
