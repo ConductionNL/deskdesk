@@ -41,16 +41,19 @@ export default {
 	components: { CnDetailPage, CnObjectDataWidget },
 
 	props: {
-		register:    { type: [String, Number], default: '' },
-		schema:      { type: String, required: true },
-		sidebar:     { type: [Boolean, Object], default: false },
-		sidebarProps:{ type: Object, default: () => ({}) },
-		title:       { type: String, default: '' },
+		register: { type: [String, Number], default: '' },
+		schema: { type: String, required: true },
+		sidebar: { type: [Boolean, Object], default: false },
+		sidebarProps: { type: Object, default: () => ({}) },
+		title: { type: String, default: '' },
 		description: { type: String, default: '' },
 		// Route params (forwarded by CnPageRenderer via { ...$route.params }).
-		id:          { type: String, default: '' },
+		id: { type: String, default: '' },
 	},
 
+	/**
+	 * @spec exclude academy tutorial demo — exposes the shared object store to the manifest-bridge wrapper, no spec-worthy behavior
+	 */
 	setup() {
 		return { objectStore: useObjectStore() }
 	},
@@ -62,13 +65,24 @@ export default {
 	watch: {
 		id: {
 			immediate: true,
+			/**
+			 * @spec exclude academy tutorial demo — fetches the detail object when the route id changes, no spec-worthy behavior
+			 */
 			async handler() {
 				if (!this.id) return
+				// Capture the target ID to guard against races when the user
+				// navigates quickly between detail pages (issue #59).
+				const targetId = this.id
 				this.loading = true
 				try {
-					this.object = await this.objectStore.fetchObject(this.schema, this.id)
+					const obj = await this.objectStore.fetchObject(this.schema, targetId)
+					if (this.id === targetId) {
+						this.object = obj
+					}
 				} finally {
-					this.loading = false
+					if (this.id === targetId) {
+						this.loading = false
+					}
 				}
 			},
 		},

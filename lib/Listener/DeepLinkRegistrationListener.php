@@ -53,15 +53,29 @@ class DeepLinkRegistrationListener implements IEventListener
             return;
         }
 
-        // Register Article object deep links (schema.org/Article — see ADR-011).
-        // Replace 'deskdesk' with your app ID and update the register slug,
-        // schema slug, and URL template to match your app's actual schemas.
+        // Register deep links for the desk schema — browse desks by UUID.
         // ADR-004: deep link URL MUST use path format (history mode), NOT hash format.
         $event->register(
             appId: 'deskdesk',
             registerSlug: 'deskdesk',
-            schemaSlug: 'article',
-            urlTemplate: '/apps/deskdesk/items/{uuid}'
+            schemaSlug: 'desk',
+            urlTemplate: '/apps/deskdesk/desks/{uuid}'
+        );
+
+        // Register deep links for the booking schema.
+        $event->register(
+            appId: 'deskdesk',
+            registerSlug: 'deskdesk',
+            schemaSlug: 'booking',
+            urlTemplate: '/apps/deskdesk/bookings/{uuid}'
+        );
+
+        // Register deep links for the floor schema.
+        $event->register(
+            appId: 'deskdesk',
+            registerSlug: 'deskdesk',
+            schemaSlug: 'floor',
+            urlTemplate: '/apps/deskdesk/floors/{uuid}'
         );
 
     }//end handle()

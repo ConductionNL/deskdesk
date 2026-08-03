@@ -1,8 +1,6 @@
 {
-  "$schema": "https://raw.githubusercontent.com/ConductionNL/nextcloud-vue/main/src/schemas/app-manifest.schema.json",
-  "version": "1.0.0",
-  "id": "deskdesk",
-  "title": "DeskDesk",
+  "$schema": "https://raw.githubusercontent.com/ConductionNL/nextcloud-vue/main/src/schemas/app-manifest-v2.schema.json",
+  "version": "2.0.0",
   "dependencies": ["openregister"],
   "menu": [
     {
@@ -25,6 +23,22 @@
       "icon": "icon-category-monitoring",
       "route": "floors-index",
       "order": 30
+    },
+    {
+      "id": "Documentation",
+      "label": "Documentation",
+      "icon": "icon-info",
+      "href": "https://deskdesk.conduction.nl",
+      "section": "footer",
+      "order": 90
+    },
+    {
+      "id": "FeaturesRoadmapMenu",
+      "label": "Features & roadmap",
+      "icon": "icon-toggle",
+      "route": "FeaturesRoadmap",
+      "section": "footer",
+      "order": 91
     }
   ],
   "pages": [
@@ -50,6 +64,7 @@
         "register": "deskdesk",
         "schema": "desk",
         "sidebar": {
+          "enabled": true,
           "tabs": [
             {
               "id": "data",
@@ -91,7 +106,8 @@
       "title": "deskdesk.bookings.detailTitle",
       "config": {
         "register": "deskdesk",
-        "schema": "booking"
+        "schema": "booking",
+        "sidebar": true
       }
     },
     {
@@ -113,7 +129,17 @@
       "title": "deskdesk.floors.detailTitle",
       "config": {
         "register": "deskdesk",
-        "schema": "floor"
+        "schema": "floor",
+        "sidebar": true
+      }
+    },
+    {
+      "id": "FeaturesRoadmap",
+      "route": "/features-roadmap",
+      "type": "roadmap",
+      "title": "Features & roadmap",
+      "config": {
+        "documentationUrl": "https://deskdesk.conduction.nl"
       }
     }
   ]

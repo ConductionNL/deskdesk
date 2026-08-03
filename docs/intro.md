@@ -1,5 +1,6 @@
 ---
 sidebar_position: 1
+description: Get started with DeskDesk, flexible desk booking on Nextcloud. Floor plans, slot bookings, Calendar sync, and wiki-driven how-tos.
 ---
 
 # DeskDesk

@@ -1,0 +1,19 @@
+# phpstan baseline generated during Phase 2 canonical root-config sync.
+# Each entry tracked in https://github.com/ConductionNL/deskdesk/issues/32 —
+# do NOT add new entries here without a checkbox in that issue.
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Access to static property \\$SERVERROOT on an unknown class OC\\.$#"
+			count: 1
+			path: lib/Service/SettingsService.php
+
+		-
+			message: "#^Parameter \\#1 \\$settings of attribute class OCP\\\\AppFramework\\\\Http\\\\Attribute\\\\AuthorizedAdminSetting constructor expects class\\-string\\<OCP\\\\Settings\\\\IDelegatedSettings\\>, string given\\.$#"
+			count: 2
+			path: lib/Controller/SettingsController.php
+
+		-
+			message: "#^Parameter \\#1 \\$settings of attribute class OCP\\\\AppFramework\\\\Http\\\\Attribute\\\\AuthorizedAdminSetting constructor expects class\\-string\\<OCP\\\\Settings\\\\IDelegatedSettings\\>, string given\\.$#"
+			count: 1
+			path: lib/Controller/MetricsController.php

@@ -4,7 +4,7 @@
  * Unit tests for SettingsController.
  *
  * @category Test
- * @package  OCA\AppTemplate\Tests\Unit\Controller
+ * @package  OCA\DeskDesk\Tests\Unit\Controller
  *
  * @author    Conduction Development Team <info@conduction.nl>
  * @copyright 2026 Conduction B.V.
@@ -17,12 +17,14 @@
 
 declare(strict_types=1);
 
-namespace OCA\AppTemplate\Tests\Unit\Controller;
+namespace OCA\DeskDesk\Tests\Unit\Controller;
 
-use OCA\AppTemplate\Controller\SettingsController;
-use OCA\AppTemplate\Service\SettingsService;
+use OCA\DeskDesk\Controller\SettingsController;
+use OCA\DeskDesk\Service\SettingsService;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\IRequest;
+use OCP\IUser;
+use OCP\IUserSession;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -55,6 +57,13 @@ class SettingsControllerTest extends TestCase
     private SettingsService&MockObject $settingsService;
 
     /**
+     * Mock IUserSession.
+     *
+     * @var IUserSession&MockObject
+     */
+    private IUserSession&MockObject $userSession;
+
+    /**
      * Mock LoggerInterface.
      *
      * @var LoggerInterface&MockObject
@@ -74,11 +83,13 @@ class SettingsControllerTest extends TestCase
 
         $this->request         = $this->createMock(IRequest::class);
         $this->settingsService = $this->createMock(SettingsService::class);
+        $this->userSession     = $this->createMock(IUserSession::class);
         $this->logger          = $this->createMock(LoggerInterface::class);
 
         $this->controller = new SettingsController(
             request: $this->request,
             settingsService: $this->settingsService,
+            userSession: $this->userSession,
             logger: $this->logger,
         );
 
@@ -98,6 +109,11 @@ class SettingsControllerTest extends TestCase
             'openregisters' => true,
             'isAdmin'       => false,
         ];
+
+        $user = $this->createMock(IUser::class);
+        $this->userSession->expects($this->once())
+            ->method('getUser')
+            ->willReturn($user);
 
         $this->settingsService->expects($this->once())
             ->method('getSettings')
@@ -176,6 +192,11 @@ class SettingsControllerTest extends TestCase
      */
     public function testIndexReturnsGenericErrorOnServiceException(): void
     {
+        $user = $this->createMock(IUser::class);
+        $this->userSession->expects($this->once())
+            ->method('getUser')
+            ->willReturn($user);
+
         $this->settingsService->expects($this->once())
             ->method('getSettings')
             ->willThrowException(new \RuntimeException('db exploded — secret host info'));
