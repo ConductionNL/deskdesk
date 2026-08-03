@@ -8,6 +8,7 @@
 		<template #sidebar>
 			<CnObjectSidebar
 				v-if="objectSidebarState.active"
+				v-model:open="objectSidebarState.open"
 				:object-type="objectSidebarState.objectType"
 				:object-id="objectSidebarState.objectId"
 				:title="objectSidebarState.title"
@@ -16,14 +17,13 @@
 				:schema="objectSidebarState.schema"
 				:tabs="objectSidebarState.tabs"
 				:hidden-tabs="objectSidebarState.hiddenTabs"
-				:custom-components="customComponents"
-				:open.sync="objectSidebarState.open" />
+				:custom-components="customComponents" />
 		</template>
 	</CnAppRoot>
 </template>
 
 <script>
-import Vue from 'vue'
+import { reactive } from 'vue'
 import { CnAppRoot, CnObjectSidebar, defaultPageTypes } from '@conduction/nextcloud-vue'
 import manifest from './manifest.json'
 import IndexPageWrapper from './views/IndexPageWrapper.vue'
@@ -34,6 +34,8 @@ import KnowledgeTab from './views/KnowledgeTab.vue'
 // that bridge manifest config + route params onto CnIndexPage and
 // CnDetailPage. See {Index,Detail}PageWrapper.vue for the rationale.
 // Other page types (`dashboard`, `settings`, ...) keep library defaults.
+// `defaultPageTypes` is exported FROZEN, so it is spread into a fresh object
+// before the two overrides are layered on — mutating the export in place throws.
 const pageTypes = {
 	...defaultPageTypes,
 	index: IndexPageWrapper,
@@ -71,7 +73,10 @@ export default {
 			manifest,
 			pageTypes,
 			customComponents,
-			objectSidebarState: Vue.observable({
+			// `Vue.observable()` was removed in Vue 3 — `reactive()` is the
+			// replacement. This object is `provide()`d, so it must stay the same
+			// identity across the component's lifetime.
+			objectSidebarState: reactive({
 				active: false,
 				open: true,
 				objectType: '',

@@ -6,4 +6,4 @@ use OCP\Util;
 $appId = OCA\DeskDesk\AppInfo\Application::APP_ID;
 Util::addScript($appId, $appId . '-main');
 ?>
-<div id="content"></div>
+<div id="deskdesk-app"></div>
