@@ -24,7 +24,7 @@
   "dependencies": {
     "@babel/core": "^7.29.0",
     "@codemirror/commands": "^6.10.3",
-    "@conduction/nextcloud-vue": "2.1.0-vue3.17",
+    "@conduction/nextcloud-vue": "3.0.0-vue3.4",
     "@nextcloud/auth": "^2.5.0",
     "@nextcloud/axios": "~2.5.2",
     "@nextcloud/dialogs": "^7.4.1",
